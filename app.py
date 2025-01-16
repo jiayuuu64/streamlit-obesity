@@ -1,62 +1,13 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import LabelEncoder
+import joblib
 
-# Load the dataset
-@st.cache_data
-def load_data():
-    # Replace with the path to your dataset
-    df = pd.read_csv("Obesity prediction.csv")
-    return df
-
-data = load_data()
-
-# Preprocessing the dataset
-def preprocess_dataset(df):
-    df = df.copy()
-    
-    # Encoding categorical columns
-    label_encodings = {
-        "Gender": {"Male": 0, "Female": 1},
-        "family_history": {"Yes": 1, "No": 0},
-        "FAVC": {"Yes": 1, "No": 0},
-        "SMOKE": {"Yes": 1, "No": 0},
-        "SCC": {"Yes": 1, "No": 0},
-        "FAF": {"Low": 0, "Medium": 1, "High": 2},
-        "MTRANS": {"Walking": 0, "Public_Transportation": 1, "Automobile": 2, "Bike": 3, "Motorbike": 4},
-        "CAEC": {"No": 0, "Sometimes": 1, "Frequently": 2, "Always": 3},
-        "CALC": {"No": 0, "Sometimes": 1, "Frequently": 2, "Always": 3},
-    }
-
-    for col, mapping in label_encodings.items():
-        if col in df.columns:
-            df[col] = df[col].map(mapping)
-    
-    # Encoding the target variable
-    target_encoder = LabelEncoder()
-    df["Obesity"] = target_encoder.fit_transform(df["Obesity"])
-    
-    return df, target_encoder
-
-processed_data, target_encoder = preprocess_dataset(data)
-
-# Splitting the dataset
-X = processed_data.drop("Obesity", axis=1)
-y = processed_data["Obesity"]
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Train the model
-@st.cache_resource
-def train_model():
-    model = RandomForestClassifier(random_state=42)
-    model.fit(X_train, y_train)
-    return model
-
-model = train_model()
+# Load the model
+try:
+    model = joblib.load("obesity_model.pkl")
+except Exception as e:
+    st.error(f"Error loading the model: {e}")
+    st.stop()
 
 # Sidebar for user input
 st.sidebar.header("User Input Parameters")
@@ -75,6 +26,12 @@ def user_input_features():
     caec = st.sidebar.selectbox("Eating Habit (CAEC)", ["No", "Sometimes", "Frequently", "Always"])
     calc = st.sidebar.selectbox("Caloric Intake (CALC)", ["No", "Sometimes", "Frequently", "Always"])
     
+    # Add missing features with default values
+    fcvc = st.sidebar.slider("Frequency of Consumption of Vegetables (FCVC)", 1, 3, 2)
+    ncp = st.sidebar.slider("Number of Meals per Day (NCP)", 1, 5, 3)
+    ch2o = st.sidebar.slider("Daily Water Consumption (CH2O in liters)", 1, 3, 2)
+    tue = st.sidebar.slider("Time Using Technology (TUE in hours)", 0, 2, 1)
+    
     data = {
         "Gender": gender,
         "Age": age,
@@ -88,6 +45,10 @@ def user_input_features():
         "MTRANS": mtrans,
         "CAEC": caec,
         "CALC": calc,
+        "FCVC": fcvc,
+        "NCP": ncp,
+        "CH2O": ch2o,
+        "TUE": tue,
     }
     features = pd.DataFrame(data, index=[0])
     return features
@@ -125,12 +86,24 @@ preprocessed_input = preprocess_user_input(user_input)
 # Prediction
 try:
     prediction_index = model.predict(preprocessed_input)[0]
-    prediction_label = target_encoder.inverse_transform([prediction_index])[0]
     prediction_proba = model.predict_proba(preprocessed_input)
     predicted_class_proba = prediction_proba[0][prediction_index]
 except Exception as e:
     st.error(f"Prediction Error: {e}")
     st.stop()
+
+# Map prediction to obesity level labels
+obesity_levels = {
+    0: "Insufficient_Weight",
+    1: "Normal_Weight",
+    2: "Obesity_Type_I",
+    3: "Obesity_Type_II",
+    4: "Obesity_Type_III",
+    5: "Overweight_Level_I",
+    6: "Overweight_Level_II"
+}
+
+prediction_label = obesity_levels.get(prediction_index, "Unknown")
 
 # Display prediction
 st.subheader("Prediction")
@@ -139,7 +112,3 @@ st.write(f"Predicted Obesity Level: {prediction_label}")
 # Display prediction probability
 st.subheader("Prediction Probability")
 st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
-
-# Display the dataset and model training details
-st.subheader("Dataset Overview")
-st.write(data)
