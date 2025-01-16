@@ -9,7 +9,7 @@ from sklearn.preprocessing import LabelEncoder
 @st.cache_data
 def load_data():
     # Replace with the path to your dataset
-    df = pd.read_csv("obesity prediction.csv")
+    df = pd.read_csv("Obesity prediction.csv")
     return df
 
 data = load_data()
