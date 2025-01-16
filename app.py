@@ -123,7 +123,8 @@ st.write(f'Predicted Obesity Level: {predicted_level}')
 
 # Display prediction probability
 st.subheader('Prediction Probability')
-# We need to access the probability for the predicted class
+# Correct access of probability for the predicted class
+# prediction_proba[0] corresponds to the first sample, and prediction[0] is the predicted class index
 predicted_class_proba = prediction_proba[0][prediction[0]]
 st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
 
