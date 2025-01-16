@@ -29,7 +29,7 @@ def train_model():
     dt_model = DecisionTreeClassifier(criterion='entropy', min_samples_leaf=1, min_samples_split=2, random_state=42)
     dt_model.fit(X_train, y_train)
     
-    # Return the trained model
+    # Return the trained model and the feature columns for reindexing input data
     return dt_model, X.columns
 
 # Train the model (cached)
@@ -74,40 +74,39 @@ def user_input_features():
     return features
 
 # Get user input
-df = user_input_features()
+df_input = user_input_features()
 
 st.subheader('User Input Parameters')
-st.write(df)
+st.write(df_input)
 
 # Preprocess the input data
 le = LabelEncoder()
-df['family_history'] = le.fit_transform(df['family_history'])
-df['FAVC'] = le.fit_transform(df['FAVC'])
-df['SMOKE'] = le.fit_transform(df['SMOKE'])
-df['SCC'] = le.fit_transform(df['SCC'])
-df['FAF'] = le.fit_transform(df['FAF'])
-df['MTRANS'] = le.fit_transform(df['MTRANS'])
-df['CAEC'] = le.fit_transform(df['CAEC'])
-df['CALC'] = le.fit_transform(df['CALC'])
+df_input['family_history'] = le.fit_transform(df_input['family_history'])
+df_input['FAVC'] = le.fit_transform(df_input['FAVC'])
+df_input['SMOKE'] = le.fit_transform(df_input['SMOKE'])
+df_input['SCC'] = le.fit_transform(df_input['SCC'])
+df_input['FAF'] = le.fit_transform(df_input['FAF'])
+df_input['MTRANS'] = le.fit_transform(df_input['MTRANS'])
+df_input['CAEC'] = le.fit_transform(df_input['CAEC'])
+df_input['CALC'] = le.fit_transform(df_input['CALC'])
 
 # Ensure the input dataframe has the same columns as the training data
-df = df.reindex(columns=feature_columns, fill_value=0)
+df_input = df_input.reindex(columns=feature_columns, fill_value=0)
 
 # Make a prediction
-prediction = model.predict(df)
-prediction_proba = model.predict_proba(df)
+prediction = model.predict(df_input)
+prediction_proba = model.predict_proba(df_input)
+
+# Define obesity levels
+obesity_levels = ['Insufficient Weight', 'Normal Weight', 'Overweight Level I', 'Overweight Level II', 
+                  'Obesity Type I', 'Obesity Type II', 'Obesity Type III']
 
 # Display results
 st.subheader('Prediction')
-obesity_levels = ['Insufficient Weight', 'Normal Weight', 'Overweight Level I', 'Overweight Level II', 
-                  'Obesity Type I', 'Obesity Type II', 'Obesity Type III']
 st.write(f'Predicted Obesity Level: {obesity_levels[prediction[0]]}')
 
 st.subheader('Prediction Probability')
-st.write(prediction_proba)
+st.write(f"Probability of the predicted obesity level: {prediction_proba[0][prediction[0]]*100:.2f}%")
 
 st.subheader('Class labels and their corresponding index number')
 st.write(obesity_levels)
-
-# Display prediction probability
-st.write(f"Probability of the predicted obesity level: {prediction_proba[0][prediction[0]]*100:.2f}%")
