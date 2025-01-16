@@ -1,107 +1,115 @@
 import streamlit as st
 import pandas as pd
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import accuracy_score
 import numpy as np
+import joblib
+
+# Load the trained model and preprocessing objects
+model = joblib.load("obesity_model.pkl")
+scaler = joblib.load("scaler.pkl")
+training_columns = joblib.load("training_columns.pkl")  # Columns used during training
+
+# Mapping of labels to their corresponding index
+label_to_index = {
+    "Insufficient_Weight": 0,
+    "Normal_Weight": 1,
+    "Obesity_Type_I": 2,
+    "Obesity_Type_II": 3,
+    "Obesity_Type_III": 4,
+    "Overweight_Level_I": 5,
+    "Overweight_Level_II": 6,
+}
+index_to_label = {v: k for k, v in label_to_index.items()}
 
 st.title("Obesity Prediction App")
 st.write("This app predicts the Obesity Level based on your inputs!")
 
-# Load and preprocess data
-@st.cache_data
-def load_data():
-    df = pd.read_csv("Obesity prediction.csv")
-    label_columns = ['Gender', 'family_history', 'FAVC', 'SMOKE', 'SCC']
-    le = LabelEncoder()
-    for col in label_columns:
-        df[col] = le.fit_transform(df[col])
-    df = pd.get_dummies(df, columns=['FAF', 'MTRANS', 'CAEC', 'CALC'], drop_first=True)
+# User input features
+st.sidebar.header("User Input Parameters")
+gender = st.sidebar.selectbox("Gender", options=["Male", "Female"])
+age = st.sidebar.slider("Age", 10, 80, 25)
+height = st.sidebar.slider("Height (in cm)", 130, 200, 170)
+weight = st.sidebar.slider("Weight (in kg)", 30, 150, 70)
+family_history = st.sidebar.selectbox("Family History of Obesity", options=["Yes", "No"])
+favc = st.sidebar.selectbox("Frequent Consumption of High Caloric Food (FAVC)", options=["Yes", "No"])
+smoke = st.sidebar.selectbox("Smokes?", options=["Yes", "No"])
+scc = st.sidebar.selectbox("Calories Monitoring (SCC)", options=["Yes", "No"])
+faf = st.sidebar.selectbox("Physical Activity (FAF)", options=["None", "Low", "Medium", "High"])
+mtrans = st.sidebar.selectbox("Mode of Transportation (MTRANS)", options=["Walking", "Bike", "Motorbike", "Public_Transportation", "Automobile"])
+caec = st.sidebar.selectbox("Eating Habit (CAEC)", options=["No", "Sometimes", "Frequently", "Always"])
+calc = st.sidebar.selectbox("Caloric Intake (CALC)", options=["No", "Sometimes", "Frequently", "Always"])
+
+# Store user inputs into a DataFrame
+user_input = {
+    "Gender": gender,
+    "Age": age,
+    "Height": height / 100,  # Convert cm to meters
+    "Weight": weight,
+    "family_history": family_history,
+    "FAVC": favc,
+    "SMOKE": smoke,
+    "SCC": scc,
+    "FAF": faf,
+    "MTRANS": mtrans,
+    "CAEC": caec,
+    "CALC": calc,
+}
+df_input = pd.DataFrame([user_input])
+
+st.write("### User Input Parameters")
+st.write(df_input)
+
+# Preprocess the user input
+def preprocess_user_input(df):
+    df = df.copy()
+
+    # Encode categorical variables
+    categorical_features = ["Gender", "family_history", "FAVC", "SMOKE", "SCC", "FAF", "MTRANS", "CAEC", "CALC"]
+    for col in categorical_features:
+        df[col] = df[col].astype("category")
+        df[col] = df[col].cat.codes
+
+    # Scale numerical features
+    numerical_features = ["Age", "Height", "Weight"]
+    df[numerical_features] = scaler.transform(df[numerical_features])
+
+    # Align columns with the training dataset
+    df = pd.get_dummies(df)
+    df = df.reindex(columns=training_columns, fill_value=0)
+
     return df
 
-data = load_data()
-X = data.drop(columns=['Obesity'])
-y = data['Obesity']
+# Preprocess the input
+try:
+    preprocessed_input = preprocess_user_input(df_input)
+except Exception as e:
+    st.error(f"Error in preprocessing: {e}")
+    st.stop()
 
-# Train model
-@st.cache_resource
-def train_model(X, y):
-    model = DecisionTreeClassifier(criterion='entropy', random_state=42)
-    model.fit(X, y)
-    return model
+# Debugging: Print processed input
+st.write("### Preprocessed Input Data")
+st.write(preprocessed_input)
 
-model = train_model(X, y)
+# Predict using the model
+try:
+    prediction_index = model.predict(preprocessed_input)[0]
+    prediction_proba = model.predict_proba(preprocessed_input)
+    prediction_label = index_to_label[prediction_index]
+except Exception as e:
+    st.error(f"Prediction error: {e}")
+    st.stop()
 
-# Obesity level mappings
-obesity_levels = {
-    "Insufficient_Weight": "Insufficient Weight",
-    "Normal_Weight": "Normal Weight",
-    "Obesity_Type_I": "Obesity Type I",
-    "Obesity_Type_II": "Obesity Type II",
-    "Obesity_Type_III": "Obesity Type III",
-    "Overweight_Level_I": "Overweight Level I",
-    "Overweight_Level_II": "Overweight Level II"
-}
-
-# Sidebar for user inputs
-st.sidebar.header("User Input Parameters")
-
-def user_input_features():
-    Gender = st.sidebar.selectbox("Gender", ("Male", "Female"))
-    Age = st.sidebar.slider("Age", 10, 80, 22)
-    Height = st.sidebar.slider("Height (in cm)", 130, 200, 178)
-    Weight = st.sidebar.slider("Weight (in kg)", 30, 150, 90)
-    family_history = st.sidebar.selectbox("Family History of Obesity", ("Yes", "No"))
-    FAVC = st.sidebar.selectbox("Frequent Consumption of High Caloric Food (FAVC)", ("Yes", "No"))
-    SMOKE = st.sidebar.selectbox("Smokes?", ("Yes", "No"))
-    SCC = st.sidebar.selectbox("Chronic Disease?", ("Yes", "No"))
-    FAF = st.sidebar.selectbox("Physical Activity (FAF)", ["Low", "Medium", "High"])
-    MTRANS = st.sidebar.selectbox("Mode of Transportation (MTRANS)", ["Walking", "Bike", "Motorbike", "Public_Transportation"])
-    CAEC = st.sidebar.selectbox("Eating Habit (CAEC)", ["no", "Sometimes", "Frequently", "Always"])
-    CALC = st.sidebar.selectbox("Caloric Intake (CALC)", ["no", "Sometimes", "Frequently", "Always"])
-
-    data = {
-        "Gender": Gender,
-        "Age": Age,
-        "Height": Height / 100,  # Convert cm to meters
-        "Weight": Weight,
-        "family_history": family_history,
-        "FAVC": FAVC,
-        "SMOKE": SMOKE,
-        "SCC": SCC,
-        "FAF": FAF,
-        "MTRANS": MTRANS,
-        "CAEC": CAEC,
-        "CALC": CALC
-    }
-    return pd.DataFrame(data, index=[0])
-
-user_input = user_input_features()
-
-# Display user input
-st.subheader("User Input Parameters")
-st.write(user_input)
-
-# Preprocess user input
-def preprocess_user_input(input_df):
-    input_df = input_df.copy()
-    le = LabelEncoder()
-    input_df["Gender"] = le.fit_transform(input_df["Gender"])
-    input_df["family_history"] = le.fit_transform(input_df["family_history"])
-    input_df["FAVC"] = le.fit_transform(input_df["FAVC"])
-    input_df["SMOKE"] = le.fit_transform(input_df["SMOKE"])
-    input_df["SCC"] = le.fit_transform(input_df["SCC"])
-    input_df = pd.get_dummies(input_df, columns=['FAF', 'MTRANS', 'CAEC', 'CALC'], drop_first=True)
-
-    # Align input_df with training data
-    input_df = input_df.reindex(columns=X.columns, fill_value=0)
-    return input_df
-
-preprocessed_input = preprocess_user_input(user_input)
-
-# Make prediction
+# Display the prediction
 st.subheader("Prediction")
-prediction_label = model.predict(preprocessed_input)[0]  # Directly get predicted label
 st.write(f"Predicted Obesity Level: {prediction_label}")
 
+# Display the prediction probability
+st.subheader("Prediction Probability")
+try:
+    predicted_class_proba = prediction_proba[0][label_to_index[prediction_label]]
+    st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
+except Exception as e:
+    st.error(f"Probability calculation error: {e}")
+
+# Display class labels for reference
+st.subheader("Class labels and their corresponding index number")
+st.write(index_to_label)
