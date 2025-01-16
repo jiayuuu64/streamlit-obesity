@@ -95,13 +95,17 @@ df_input['CALC'] = le.fit_transform(df_input['CALC'])
 # Ensure the input matches the training features
 df_input = df_input.reindex(columns=feature_columns, fill_value=0)
 
-# Prediction
+# Make a prediction
 prediction = model.predict(df_input)
-prediction_index = np.where(class_labels == prediction[0])[0][0]  # Find the index of the prediction
+
+# Locate the index of the predicted class in `model.classes_`
+predicted_class_index = np.where(class_labels == prediction[0])[0][0]
+
+# Get the prediction probabilities
 prediction_proba = model.predict_proba(df_input)
 
 # Map prediction to obesity level
-predicted_level = obesity_level_map.get(prediction_index, "Unknown")
+predicted_level = obesity_level_map.get(predicted_class_index, "Unknown")
 
 # Display prediction
 st.subheader('Prediction')
@@ -110,7 +114,7 @@ st.write(f'Predicted Obesity Level: {predicted_level}')
 # Display prediction probability
 st.subheader('Prediction Probability')
 try:
-    predicted_class_proba = prediction_proba[0][prediction_index]
+    predicted_class_proba = prediction_proba[0][predicted_class_index]
     st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
 except IndexError:
     st.write("Error: Unable to access probability for the predicted class.")
