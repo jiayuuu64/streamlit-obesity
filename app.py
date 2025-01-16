@@ -11,6 +11,9 @@ def train_model():
     # Load the dataset
     df = pd.read_csv("Obesity prediction.csv")
 
+    # Check the unique values in the Obesity column to adjust the mapping
+    st.write("Unique values in 'Obesity' column:", df['Obesity'].unique())
+
     # Preprocessing the data
     le = LabelEncoder()
     df['Gender'] = le.fit_transform(df['Gender'])
@@ -35,7 +38,8 @@ def train_model():
 # Train the model (cached)
 model, feature_columns = train_model()
 
-# Obesity level map (if the target is numeric)
+# Obesity level map (assuming numeric labels)
+# Adjust this map based on the unique values in the 'Obesity' column
 obesity_level_map = {
     0: 'Insufficient Weight',
     1: 'Normal Weight',
@@ -113,3 +117,10 @@ predicted_level = obesity_level_map.get(prediction[0], "Unknown")
 # Display results
 st.subheader('Prediction')
 st.write(f'Predicted Obesity Level: {predicted_level}')
+
+st.subheader('Prediction Probability')
+prediction_proba = model.predict_proba(df_input)
+st.write(f"Probability of the predicted obesity level: {prediction_proba[0][prediction[0]] * 100:.2f}%")
+
+st.subheader('Class labels and their corresponding index number')
+st.write(obesity_level_map)
