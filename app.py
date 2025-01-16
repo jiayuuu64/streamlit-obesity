@@ -1,7 +1,5 @@
-# Train the model within the app to avoid loading issues
 import streamlit as st
 import pandas as pd
-import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import LabelEncoder
@@ -34,6 +32,7 @@ model_training_columns = X_train.columns
 st.sidebar.header("User Input Parameters")
 
 def user_input_features():
+    Gender = st.sidebar.selectbox("Gender", ["Male", "Female"])
     Age = st.sidebar.slider("Age", 10, 80, 22)
     Height = st.sidebar.slider("Height (in cm)", 130, 200, 178)
     Weight = st.sidebar.slider("Weight (in kg)", 30, 150, 90)
@@ -47,6 +46,7 @@ def user_input_features():
     CALC = st.sidebar.selectbox("Caloric Intake (CALC)", ["No", "Sometimes", "Frequently", "Always"])
 
     data = {
+        "Gender": Gender,
         "Age": Age,
         "Height": Height / 100,  # Convert cm to meters
         "Weight": Weight,
@@ -65,13 +65,20 @@ def user_input_features():
 def preprocess_user_input(user_input):
     df_input = pd.DataFrame([user_input])
 
+    # Debugging: Check which columns exist
+    st.write("Columns in df_input before encoding:", df_input.columns)
+
     # Encode binary columns
     for col in binary_columns:
-        df_input[col] = le.fit_transform(df_input[col])
-    
+        if col in df_input.columns:  # Check if the column exists
+            df_input[col] = le.fit_transform(df_input[col])
+        else:
+            st.error(f"Column '{col}' is missing in user input!")
+            raise KeyError(f"Column '{col}' is missing in user input!")
+
     # Apply one-hot encoding
     df_input = pd.get_dummies(df_input, columns=['FAF', 'MTRANS', 'CAEC', 'CALC'], drop_first=True)
-    
+
     # Align columns with training data
     missing_cols = set(model_training_columns) - set(df_input.columns)
     for col in missing_cols:
