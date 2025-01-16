@@ -18,6 +18,9 @@ df = pd.get_dummies(df, columns=['FAF', 'MTRANS', 'CAEC', 'CALC'], drop_first=Tr
 X = df.drop(columns=['Obesity'])
 y = df['Obesity']
 
+# Check unique values in target variable
+st.write("Unique values in target (y):", y.unique())
+
 # Split dataset
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -27,6 +30,17 @@ model.fit(X_train, y_train)
 
 # Save columns for alignment
 model_training_columns = X_train.columns
+
+# Map target variable to readable labels
+obesity_levels = {
+    0: "Insufficient_Weight",
+    1: "Normal_Weight",
+    2: "Overweight_Level_I",
+    3: "Overweight_Level_II",
+    4: "Obesity_Type_I",
+    5: "Obesity_Type_II",
+    6: "Obesity_Type_III",
+}
 
 # Sidebar for user input
 st.sidebar.header("User Input Parameters")
@@ -96,19 +110,16 @@ preprocessed_input = preprocess_user_input(user_input)
 prediction = model.predict(preprocessed_input)
 prediction_proba = model.predict_proba(preprocessed_input)
 
-# Map predictions to class labels
-obesity_levels = {
-    0: "Insufficient_Weight",
-    1: "Normal_Weight",
-    2: "Overweight_Level_I",
-    3: "Overweight_Level_II",
-    4: "Obesity_Type_I",
-    5: "Obesity_Type_II",
-    6: "Obesity_Type_III",
-}
+# Debugging: Raw prediction output
+st.write(f"Raw prediction output: {prediction[0]}")
 
+# Make prediction and display results
 st.subheader("Prediction")
-st.write(f"Predicted Obesity Level: {obesity_levels[prediction[0]]}")
+if prediction[0] in obesity_levels:
+    st.write(f"Predicted Obesity Level: {obesity_levels[prediction[0]]}")
+else:
+    st.error(f"Unexpected prediction value: {prediction[0]}")
+    st.write("Ensure the model output matches the obesity_levels keys.")
 
 st.subheader("Prediction Probability")
 st.write(f"Probability of the predicted obesity level: {prediction_proba[0][prediction[0]] * 100:.2f}%")
