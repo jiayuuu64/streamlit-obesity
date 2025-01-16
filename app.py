@@ -6,7 +6,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import LabelEncoder
 
 # Caching the training process
-@st.cache_data(allow_output_mutation=True)
+@st.cache(allow_output_mutation=True)
 def train_model():
     # Load the dataset
     df = pd.read_csv("Obesity prediction.csv")
