@@ -105,14 +105,3 @@ st.subheader("Prediction")
 prediction_label = model.predict(preprocessed_input)[0]  # Directly get predicted label
 st.write(f"Predicted Obesity Level: {prediction_label}")
 
-# Show probability if possible
-st.subheader("Prediction Probability")
-try:
-    prediction_proba = model.predict_proba(preprocessed_input)
-    st.write(f"Probability of the predicted obesity level: {np.max(prediction_proba) * 100:.2f}%")
-except AttributeError:
-    st.write("Prediction probability is unavailable for this model.")
-
-# Display class labels and their corresponding values
-st.subheader("Class labels and their corresponding index number")
-st.write(obesity_levels)
