@@ -111,6 +111,9 @@ df_input = df_input.reindex(columns=feature_columns, fill_value=0)
 # Make a prediction
 prediction = model.predict(df_input)
 
+# Get the prediction probabilities
+prediction_proba = model.predict_proba(df_input)
+
 # Map prediction to obesity level
 predicted_level = obesity_level_map.get(prediction[0], "Unknown")
 
@@ -118,9 +121,11 @@ predicted_level = obesity_level_map.get(prediction[0], "Unknown")
 st.subheader('Prediction')
 st.write(f'Predicted Obesity Level: {predicted_level}')
 
+# Display prediction probability
 st.subheader('Prediction Probability')
-prediction_proba = model.predict_proba(df_input)
-st.write(f"Probability of the predicted obesity level: {prediction_proba[0][prediction[0]] * 100:.2f}%")
+# We need to access the probability for the predicted class
+predicted_class_proba = prediction_proba[0][prediction[0]]
+st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
 
 st.subheader('Class labels and their corresponding index number')
 st.write(obesity_level_map)
