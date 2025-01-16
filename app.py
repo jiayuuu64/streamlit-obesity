@@ -30,11 +30,10 @@ def train_model():
     dt_model.fit(X_train, y_train)
     
     # Return the trained model
-    return dt_model
+    return dt_model, X.columns
 
 # Train the model (cached)
-model = train_model()
-
+model, feature_columns = train_model()
 
 st.write("""
 # Obesity Prediction App
@@ -91,20 +90,21 @@ df['MTRANS'] = le.fit_transform(df['MTRANS'])
 df['CAEC'] = le.fit_transform(df['CAEC'])
 df['CALC'] = le.fit_transform(df['CALC'])
 
+# Ensure the input dataframe has the same columns as the training data
+df = df.reindex(columns=feature_columns, fill_value=0)
+
 # Make a prediction
 prediction = model.predict(df)
 prediction_proba = model.predict_proba(df)
 
 # Display results
 st.subheader('Prediction')
-st.write(f'Obesity Level: {prediction[0]}')
+obesity_levels = ['Insufficient Weight', 'Normal Weight', 'Overweight Level I', 'Overweight Level II', 
+                  'Obesity Type I', 'Obesity Type II', 'Obesity Type III']
+st.write(f'Predicted Obesity Level: {obesity_levels[prediction[0]]}')
 
 st.subheader('Prediction Probability')
 st.write(prediction_proba)
-
-# Map obesity levels to readable labels
-obesity_levels = ['Insufficient Weight', 'Normal Weight', 'Overweight Level I', 'Overweight Level II', 
-                  'Obesity Type I', 'Obesity Type II', 'Obesity Type III']
 
 st.subheader('Class labels and their corresponding index number')
 st.write(obesity_levels)
