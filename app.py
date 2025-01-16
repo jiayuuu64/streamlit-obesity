@@ -65,21 +65,29 @@ st.subheader('User Input parameters')
 st.write(df)
 
 # Load the pre-trained model (assuming 'obesity_model.pkl' is saved in the current directory)
-model = joblib.load('obesity_model.pkl')
+try:
+    model = joblib.load('obesity_model.pkl')
+except Exception as e:
+    st.error(f"Error loading model: {e}")
+    st.stop()  # Stop further execution if model cannot be loaded
 
 # Make prediction using the loaded model
 prediction = model.predict(df)
 prediction_proba = model.predict_proba(df)
 
+# Display Obesity Level based on prediction
+obesity_levels = ['Insufficient Weight', 'Normal Weight', 'Overweight Level I', 
+                  'Overweight Level II', 'Obesity Type I', 'Obesity Type II', 'Obesity Type III']
+
 # Show obesity level prediction
 st.subheader('Prediction')
-st.write(f'Predicted Obesity Level: {prediction[0]}')
+st.write(f'Predicted Obesity Level: {obesity_levels[prediction[0]]}')
 
 # Show prediction probabilities
 st.subheader('Prediction Probability')
-st.write(prediction_proba)
+proba_df = pd.DataFrame(prediction_proba, columns=obesity_levels)
+st.write(proba_df)
 
 # Display the classification labels
 st.subheader('Obesity Levels')
-st.write(['Insufficient Weight', 'Normal Weight', 'Overweight Level I', 'Overweight Level II', 
-          'Obesity Type I', 'Obesity Type II', 'Obesity Type III'])
+st.write(obesity_levels)
