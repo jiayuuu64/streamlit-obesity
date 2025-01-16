@@ -28,9 +28,9 @@ model.fit(X_train, y_train)
 # Save columns for alignment
 model_training_columns = X_train.columns
 
-# Map target labels to indices
-label_to_index = {label: idx for idx, label in enumerate(sorted(y.unique()))}
-index_to_label = {idx: label for label, idx in label_to_index.items()}
+# Create index-to-label and label-to-index mappings based on model classes
+index_to_label = {index: label for index, label in enumerate(model.classes_)}
+label_to_index = {label: index for index, label in index_to_label.items()}
 
 # Sidebar for user input
 st.sidebar.header("User Input Parameters")
@@ -95,7 +95,7 @@ st.write(pd.DataFrame([user_input]))
 # Preprocess user input and predict
 preprocessed_input = preprocess_user_input(user_input)
 prediction_index = model.predict(preprocessed_input)[0]
-prediction_label = index_to_label[prediction_index]
+prediction_label = index_to_label.get(prediction_index, "Unknown")
 prediction_proba = model.predict_proba(preprocessed_input)
 
 # Debugging: Raw prediction output
@@ -107,7 +107,7 @@ st.subheader("Prediction")
 st.write(f"Predicted Obesity Level: {prediction_label}")
 
 st.subheader("Prediction Probability")
-predicted_class_proba = prediction_proba[0][prediction_index]
+predicted_class_proba = prediction_proba[0][label_to_index[prediction_label]]
 st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
 
 st.subheader("Class labels and their corresponding index number")
