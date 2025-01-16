@@ -1,13 +1,10 @@
 import streamlit as st
 import pandas as pd
-import joblib
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
 
-# Load the model
-try:
-    model = joblib.load("obesity_model.pkl")
-except Exception as e:
-    st.error(f"Error loading the model: {e}")
-    st.stop()
+# Title
+st.title("Obesity Prediction App")
 
 # Sidebar for user input
 st.sidebar.header("User Input Parameters")
@@ -25,13 +22,11 @@ def user_input_features():
     mtrans = st.sidebar.selectbox("Mode of Transportation (MTRANS)", ["Walking", "Public_Transportation", "Automobile", "Bike", "Motorbike"])
     caec = st.sidebar.selectbox("Eating Habit (CAEC)", ["No", "Sometimes", "Frequently", "Always"])
     calc = st.sidebar.selectbox("Caloric Intake (CALC)", ["No", "Sometimes", "Frequently", "Always"])
-    
-    # Add missing features with default values
     fcvc = st.sidebar.slider("Frequency of Consumption of Vegetables (FCVC)", 1, 3, 2)
     ncp = st.sidebar.slider("Number of Meals per Day (NCP)", 1, 5, 3)
     ch2o = st.sidebar.slider("Daily Water Consumption (CH2O in liters)", 1, 3, 2)
     tue = st.sidebar.slider("Time Using Technology (TUE in hours)", 0, 2, 1)
-    
+
     data = {
         "Gender": gender,
         "Age": age,
@@ -55,15 +50,12 @@ def user_input_features():
 
 user_input = user_input_features()
 
-# Show the user input
+# Display user input
 st.subheader("User Input Parameters")
 st.write(user_input)
 
-# Preprocess the user input
-def preprocess_user_input(df_input):
-    df_input = df_input.copy()
-    
-    # Encoding for categorical variables
+# Preprocess the dataset
+def preprocess_data(df):
     label_encodings = {
         "Gender": {"Male": 0, "Female": 1},
         "family_history": {"Yes": 1, "No": 0},
@@ -75,35 +67,56 @@ def preprocess_user_input(df_input):
         "CAEC": {"No": 0, "Sometimes": 1, "Frequently": 2, "Always": 3},
         "CALC": {"No": 0, "Sometimes": 1, "Frequently": 2, "Always": 3},
     }
-    
     for col, mapping in label_encodings.items():
-        if col in df_input.columns:
-            df_input[col] = df_input[col].map(mapping)
-    return df_input
+        if col in df.columns:
+            df[col] = df[col].map(mapping)
+    return df
 
-preprocessed_input = preprocess_user_input(user_input)
+# Load dataset
+@st.cache_data
+def load_data():
+    df = pd.read_csv("Obesity prediction.csv")  # Replace with your dataset filename
+    return df
 
-# Prediction
+data = load_data()
+
+# Preprocess the dataset
+data = preprocess_data(data)
+
+# Separate features and target
+X = data.drop(columns=["Obesity"])  # Replace 'Obesity' with your target column name
+y = data["Obesity"]
+
+# Split into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train the model
+clf = RandomForestClassifier(random_state=42)
+clf.fit(X_train, y_train)
+
+# Preprocess user input
+preprocessed_input = preprocess_data(user_input)
+
+# Make predictions
 try:
-    prediction_index = model.predict(preprocessed_input)[0]
-    prediction_proba = model.predict_proba(preprocessed_input)
-    predicted_class_proba = prediction_proba[0][prediction_index]
+    prediction = clf.predict(preprocessed_input)[0]
+    prediction_proba = clf.predict_proba(preprocessed_input)[0]
 except Exception as e:
     st.error(f"Prediction Error: {e}")
     st.stop()
 
 # Map prediction to obesity level labels
 obesity_levels = {
-    0: "Insufficient_Weight",
-    1: "Normal_Weight",
-    2: "Obesity_Type_I",
-    3: "Obesity_Type_II",
-    4: "Obesity_Type_III",
-    5: "Overweight_Level_I",
-    6: "Overweight_Level_II"
+    "Insufficient_Weight": "Insufficient Weight",
+    "Normal_Weight": "Normal Weight",
+    "Overweight_Level_I": "Overweight Level I",
+    "Overweight_Level_II": "Overweight Level II",
+    "Obesity_Type_I": "Obesity Type I",
+    "Obesity_Type_II": "Obesity Type II",
+    "Obesity_Type_III": "Obesity Type III",
 }
 
-prediction_label = obesity_levels.get(prediction_index, "Unknown")
+prediction_label = obesity_levels.get(prediction, "Unknown")
 
 # Display prediction
 st.subheader("Prediction")
@@ -111,4 +124,5 @@ st.write(f"Predicted Obesity Level: {prediction_label}")
 
 # Display prediction probability
 st.subheader("Prediction Probability")
-st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
+for level, prob in zip(clf.classes_, prediction_proba):
+    st.write(f"{obesity_levels.get(level, level)}: {prob * 100:.2f}%")
