@@ -101,14 +101,18 @@ prediction_proba = model.predict_proba(preprocessed_input)
 # Debugging: Raw prediction output
 st.write(f"Raw prediction output (index): {prediction_index}")
 st.write(f"Raw prediction output (label): {prediction_label}")
+st.write(f"Keys in label_to_index: {label_to_index.keys()}")
 
 # Make prediction and display results
 st.subheader("Prediction")
 st.write(f"Predicted Obesity Level: {prediction_label}")
 
 st.subheader("Prediction Probability")
-predicted_class_proba = prediction_proba[0][label_to_index[prediction_label]]
-st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
+if prediction_label in label_to_index:
+    predicted_class_proba = prediction_proba[0][label_to_index[prediction_label]]
+    st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
+else:
+    st.error(f"Prediction label '{prediction_label}' not found in label_to_index!")
 
 st.subheader("Class labels and their corresponding index number")
 st.write(index_to_label)
