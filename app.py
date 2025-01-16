@@ -5,13 +5,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import LabelEncoder
 
-# Caching the training process
+# Cache the training process
 @st.cache(allow_output_mutation=True)
 def train_model():
     # Load the dataset
     df = pd.read_csv("Obesity prediction.csv")
 
-    # Preprocessing the data
+    # Preprocessing
     le = LabelEncoder()
     df['Gender'] = le.fit_transform(df['Gender'])
     df['family_history'] = le.fit_transform(df['family_history'])
@@ -20,34 +20,22 @@ def train_model():
     df['SCC'] = le.fit_transform(df['SCC'])
     df = pd.get_dummies(df, columns=['FAF', 'MTRANS', 'CAEC', 'CALC'], drop_first=True)
 
-    # Splitting the dataset into features and target variable
+    # Features and target
     X = df.drop(columns=['Obesity'])
     y = df['Obesity']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Initializing and training the model
+    # Model training
     dt_model = DecisionTreeClassifier(criterion='entropy', min_samples_leaf=1, min_samples_split=2, random_state=42)
     dt_model.fit(X_train, y_train)
 
-    # Return the trained model and the class labels
     return dt_model, X.columns, dt_model.classes_
 
-# Train the model (cached)
+# Train the model
 model, feature_columns, class_labels = train_model()
 
-# Create the obesity level map
-obesity_level_map = {
-    0: 'Insufficient Weight',
-    1: 'Normal Weight',
-    2: 'Overweight Level I',
-    3: 'Overweight Level II',
-    4: 'Obesity Type I',
-    5: 'Obesity Type II',
-    6: 'Obesity Type III'
-}
-
-# Reverse map for encoding
-reverse_obesity_map = {v: k for k, v in obesity_level_map.items()}
+# Create the obesity level map dynamically from model's class labels
+obesity_level_map = {i: label for i, label in enumerate(class_labels)}
 
 st.write("""
 # Obesity Prediction App
@@ -93,7 +81,7 @@ df_input = user_input_features()
 st.subheader('User Input Parameters')
 st.write(df_input)
 
-# Preprocess the input data
+# Preprocess the input
 le = LabelEncoder()
 df_input['family_history'] = le.fit_transform(df_input['family_history'])
 df_input['FAVC'] = le.fit_transform(df_input['FAVC'])
@@ -104,30 +92,29 @@ df_input['MTRANS'] = le.fit_transform(df_input['MTRANS'])
 df_input['CAEC'] = le.fit_transform(df_input['CAEC'])
 df_input['CALC'] = le.fit_transform(df_input['CALC'])
 
-# Ensure the input dataframe has the same columns as the training data
+# Ensure the input matches the training features
 df_input = df_input.reindex(columns=feature_columns, fill_value=0)
 
-# Make a prediction
+# Prediction
 prediction = model.predict(df_input)
-predicted_index = prediction[0]  # This is an integer index
-
-# Get the prediction probabilities
+prediction_index = np.where(class_labels == prediction[0])[0][0]  # Find the index of the prediction
 prediction_proba = model.predict_proba(df_input)
 
 # Map prediction to obesity level
-predicted_level = obesity_level_map.get(predicted_index, "Unknown")
+predicted_level = obesity_level_map.get(prediction_index, "Unknown")
 
-# Display results
+# Display prediction
 st.subheader('Prediction')
 st.write(f'Predicted Obesity Level: {predicted_level}')
 
 # Display prediction probability
 st.subheader('Prediction Probability')
 try:
-    predicted_class_proba = prediction_proba[0][predicted_index]
+    predicted_class_proba = prediction_proba[0][prediction_index]
     st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
 except IndexError:
     st.write("Error: Unable to access probability for the predicted class.")
 
+# Display class mapping
 st.subheader('Class labels and their corresponding index number')
 st.write(obesity_level_map)
