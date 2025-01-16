@@ -1,26 +1,62 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import joblib
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import LabelEncoder
 
-# Load the model
-try:
-    model = joblib.load("obesity_model.pkl")
-except Exception as e:
-    st.error(f"Error loading the model: {e}")
-    st.stop()
+# Load the dataset
+@st.cache_data
+def load_data():
+    # Replace with the path to your dataset
+    df = pd.read_csv("obesity.csv")
+    return df
 
-# Define label encoding mappings for consistent processing
-label_to_index = {
-    "Insufficient_Weight": 0,
-    "Normal_Weight": 1,
-    "Obesity_Type_I": 2,
-    "Obesity_Type_II": 3,
-    "Obesity_Type_III": 4,
-    "Overweight_Level_I": 5,
-    "Overweight_Level_II": 6,
-}
-index_to_label = {v: k for k, v in label_to_index.items()}
+data = load_data()
+
+# Preprocessing the dataset
+def preprocess_dataset(df):
+    df = df.copy()
+    
+    # Encoding categorical columns
+    label_encodings = {
+        "Gender": {"Male": 0, "Female": 1},
+        "family_history": {"Yes": 1, "No": 0},
+        "FAVC": {"Yes": 1, "No": 0},
+        "SMOKE": {"Yes": 1, "No": 0},
+        "SCC": {"Yes": 1, "No": 0},
+        "FAF": {"Low": 0, "Medium": 1, "High": 2},
+        "MTRANS": {"Walking": 0, "Public_Transportation": 1, "Automobile": 2, "Bike": 3, "Motorbike": 4},
+        "CAEC": {"No": 0, "Sometimes": 1, "Frequently": 2, "Always": 3},
+        "CALC": {"No": 0, "Sometimes": 1, "Frequently": 2, "Always": 3},
+    }
+
+    for col, mapping in label_encodings.items():
+        if col in df.columns:
+            df[col] = df[col].map(mapping)
+    
+    # Encoding the target variable
+    target_encoder = LabelEncoder()
+    df["Obesity"] = target_encoder.fit_transform(df["Obesity"])
+    
+    return df, target_encoder
+
+processed_data, target_encoder = preprocess_dataset(data)
+
+# Splitting the dataset
+X = processed_data.drop("Obesity", axis=1)
+y = processed_data["Obesity"]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train the model
+@st.cache_resource
+def train_model():
+    model = RandomForestClassifier(random_state=42)
+    model.fit(X_train, y_train)
+    return model
+
+model = train_model()
 
 # Sidebar for user input
 st.sidebar.header("User Input Parameters")
@@ -89,7 +125,7 @@ preprocessed_input = preprocess_user_input(user_input)
 # Prediction
 try:
     prediction_index = model.predict(preprocessed_input)[0]
-    prediction_label = index_to_label[prediction_index]
+    prediction_label = target_encoder.inverse_transform([prediction_index])[0]
     prediction_proba = model.predict_proba(preprocessed_input)
     predicted_class_proba = prediction_proba[0][prediction_index]
 except Exception as e:
@@ -104,6 +140,6 @@ st.write(f"Predicted Obesity Level: {prediction_label}")
 st.subheader("Prediction Probability")
 st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
 
-# Display label-to-index mapping for debugging
-st.subheader("Class labels and their corresponding index number")
-st.write(index_to_label)
+# Display the dataset and model training details
+st.subheader("Dataset Overview")
+st.write(data)
