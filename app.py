@@ -18,9 +18,6 @@ df = pd.get_dummies(df, columns=['FAF', 'MTRANS', 'CAEC', 'CALC'], drop_first=Tr
 X = df.drop(columns=['Obesity'])
 y = df['Obesity']
 
-# Check unique values in target variable
-st.write("Unique values in target (y):", y.unique())
-
 # Split dataset
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -31,16 +28,9 @@ model.fit(X_train, y_train)
 # Save columns for alignment
 model_training_columns = X_train.columns
 
-# Map target variable to readable labels
-obesity_levels = {
-    0: "Insufficient_Weight",
-    1: "Normal_Weight",
-    2: "Overweight_Level_I",
-    3: "Overweight_Level_II",
-    4: "Obesity_Type_I",
-    5: "Obesity_Type_II",
-    6: "Obesity_Type_III",
-}
+# Map target labels to indices
+label_to_index = {label: idx for idx, label in enumerate(sorted(y.unique()))}
+index_to_label = {idx: label for label, idx in label_to_index.items()}
 
 # Sidebar for user input
 st.sidebar.header("User Input Parameters")
@@ -79,9 +69,6 @@ def user_input_features():
 def preprocess_user_input(user_input):
     df_input = pd.DataFrame([user_input])
 
-    # Debugging: Check which columns exist
-    st.write("Columns in df_input before encoding:", df_input.columns)
-
     # Encode binary columns
     for col in binary_columns:
         if col in df_input.columns:  # Check if the column exists
@@ -107,22 +94,21 @@ st.write(pd.DataFrame([user_input]))
 
 # Preprocess user input and predict
 preprocessed_input = preprocess_user_input(user_input)
-prediction = model.predict(preprocessed_input)
+prediction_index = model.predict(preprocessed_input)[0]
+prediction_label = index_to_label[prediction_index]
 prediction_proba = model.predict_proba(preprocessed_input)
 
 # Debugging: Raw prediction output
-st.write(f"Raw prediction output: {prediction[0]}")
+st.write(f"Raw prediction output (index): {prediction_index}")
+st.write(f"Raw prediction output (label): {prediction_label}")
 
 # Make prediction and display results
 st.subheader("Prediction")
-if prediction[0] in obesity_levels:
-    st.write(f"Predicted Obesity Level: {obesity_levels[prediction[0]]}")
-else:
-    st.error(f"Unexpected prediction value: {prediction[0]}")
-    st.write("Ensure the model output matches the obesity_levels keys.")
+st.write(f"Predicted Obesity Level: {prediction_label}")
 
 st.subheader("Prediction Probability")
-st.write(f"Probability of the predicted obesity level: {prediction_proba[0][prediction[0]] * 100:.2f}%")
+predicted_class_proba = prediction_proba[0][prediction_index]
+st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
 
 st.subheader("Class labels and their corresponding index number")
-st.write(obesity_levels)
+st.write(index_to_label)
