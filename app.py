@@ -6,7 +6,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import LabelEncoder
 
 # Caching the training process
-@st.cache(allow_output_mutation=True)
+@st.cache_data(allow_output_mutation=True)
 def train_model():
     # Load the dataset
     df = pd.read_csv("Obesity prediction.csv")
@@ -120,10 +120,7 @@ st.write("Shape of prediction_proba:", prediction_proba.shape)
 st.write("Contents of prediction_proba:", prediction_proba)
 
 # Map prediction to obesity level
-if prediction[0] in obesity_level_map:
-    predicted_level = obesity_level_map[prediction[0]]
-else:
-    predicted_level = "Unknown"
+predicted_level = obesity_level_map.get(prediction[0], "Unknown")
 
 # Display results
 st.subheader('Prediction')
@@ -133,11 +130,9 @@ st.write(f'Predicted Obesity Level: {predicted_level}')
 st.subheader('Prediction Probability')
 
 # Access the probability for the predicted class
-try:
-    predicted_class_proba = prediction_proba[0][prediction[0]]
-    st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
-except IndexError:
-    st.write("Error: Unable to access probability for the predicted class.")
+predicted_class_proba = prediction_proba[0][prediction[0]]
+
+st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
 
 st.subheader('Class labels and their corresponding index number')
 st.write(obesity_level_map)
