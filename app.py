@@ -35,6 +35,17 @@ def train_model():
 # Train the model (cached)
 model, feature_columns = train_model()
 
+# Obesity level map (if the target is numeric)
+obesity_level_map = {
+    0: 'Insufficient Weight',
+    1: 'Normal Weight',
+    2: 'Overweight Level I',
+    3: 'Overweight Level II',
+    4: 'Obesity Type I',
+    5: 'Obesity Type II',
+    6: 'Obesity Type III'
+}
+
 st.write("""
 # Obesity Prediction App
 This app predicts the **Obesity Level** based on your inputs!
@@ -95,18 +106,10 @@ df_input = df_input.reindex(columns=feature_columns, fill_value=0)
 
 # Make a prediction
 prediction = model.predict(df_input)
-prediction_proba = model.predict_proba(df_input)
 
-# Define obesity levels
-obesity_levels = ['Insufficient Weight', 'Normal Weight', 'Overweight Level I', 'Overweight Level II', 
-                  'Obesity Type I', 'Obesity Type II', 'Obesity Type III']
+# Map prediction to obesity level
+predicted_level = obesity_level_map.get(prediction[0], "Unknown")
 
 # Display results
 st.subheader('Prediction')
-st.write(f'Predicted Obesity Level: {obesity_levels[prediction[0]]}')
-
-st.subheader('Prediction Probability')
-st.write(f"Probability of the predicted obesity level: {prediction_proba[0][prediction[0]]*100:.2f}%")
-
-st.subheader('Class labels and their corresponding index number')
-st.write(obesity_levels)
+st.write(f'Predicted Obesity Level: {predicted_level}')
