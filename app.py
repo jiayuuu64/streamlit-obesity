@@ -6,7 +6,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import LabelEncoder
 
 # Cache the training process
-@st.cache(allow_output_mutation=True)
+@st.cache_data
 def train_model():
     # Load the dataset
     df = pd.read_csv("Obesity prediction.csv")
@@ -95,15 +95,27 @@ df_input['CALC'] = le.fit_transform(df_input['CALC'])
 # Ensure the input matches the training features
 df_input = df_input.reindex(columns=feature_columns, fill_value=0)
 
+# Debugging Steps
+st.write("### Debugging Information:")
+st.write("Raw User Input Data:")
+st.write(df_input)
+
+st.write("Feature Alignment Check:")
+st.write("Feature Columns in Model Training Order:", feature_columns)
+st.write("Columns in App Input Data:", df_input.columns)
+
+# Uncomment if comparing with dataset
+# st.write("Original Dataset Row (for comparison):")
+# st.write(df.iloc[ROW_INDEX])  # Replace ROW_INDEX with the index of the dataset row you want to compare.
+
 # Prediction
 prediction = model.predict(df_input)[0]  # Get the predicted class label
-prediction_index = np.where(class_labels == prediction)[0][0]  # Find its index
 
 # Get the prediction probabilities
 prediction_proba = model.predict_proba(df_input)
 
 # Map prediction to obesity level
-predicted_level = obesity_level_map.get(prediction_index, "Unknown")
+predicted_level = obesity_level_map.get(np.where(class_labels == prediction)[0][0], "Unknown")
 
 # Display prediction
 st.subheader('Prediction')
@@ -112,7 +124,7 @@ st.write(f'Predicted Obesity Level: {predicted_level}')
 # Display prediction probability
 st.subheader('Prediction Probability')
 try:
-    predicted_class_proba = prediction_proba[0][prediction_index]
+    predicted_class_proba = prediction_proba[0][np.where(class_labels == prediction)[0][0]]
     st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
 except IndexError:
     st.write("Error: Unable to access probability for the predicted class.")
