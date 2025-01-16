@@ -120,7 +120,10 @@ st.write("Shape of prediction_proba:", prediction_proba.shape)
 st.write("Contents of prediction_proba:", prediction_proba)
 
 # Map prediction to obesity level
-predicted_level = obesity_level_map.get(prediction[0], "Unknown")
+if prediction[0] in obesity_level_map:
+    predicted_level = obesity_level_map[prediction[0]]
+else:
+    predicted_level = "Unknown"
 
 # Display results
 st.subheader('Prediction')
