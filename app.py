@@ -114,6 +114,10 @@ prediction = model.predict(df_input)
 # Get the prediction probabilities
 prediction_proba = model.predict_proba(df_input)
 
+# Debugging: Check the shape of prediction_proba
+st.write("Shape of prediction_proba:", prediction_proba.shape)
+st.write("Contents of prediction_proba:", prediction_proba)
+
 # Map prediction to obesity level
 predicted_level = obesity_level_map.get(prediction[0], "Unknown")
 
@@ -123,10 +127,14 @@ st.write(f'Predicted Obesity Level: {predicted_level}')
 
 # Display prediction probability
 st.subheader('Prediction Probability')
+
 # Correct access of probability for the predicted class
 # prediction_proba[0] corresponds to the first sample, and prediction[0] is the predicted class index
-predicted_class_proba = prediction_proba[0][prediction[0]]
-st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
-
+try:
+    predicted_class_proba = prediction_proba[0][prediction[0]]
+    st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
+except IndexError:
+    st.write("Error: Unable to access probability for the predicted class.")
+    
 st.subheader('Class labels and their corresponding index number')
 st.write(obesity_level_map)
