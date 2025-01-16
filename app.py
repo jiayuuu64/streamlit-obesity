@@ -11,9 +11,6 @@ def train_model():
     # Load the dataset
     df = pd.read_csv("Obesity prediction.csv")
 
-    # Check the unique values in the Obesity column to adjust the mapping
-    st.write("Unique values in 'Obesity' column:", df['Obesity'].unique())
-
     # Preprocessing the data
     le = LabelEncoder()
     df['Gender'] = le.fit_transform(df['Gender'])
@@ -31,15 +28,14 @@ def train_model():
     # Initializing and training the model
     dt_model = DecisionTreeClassifier(criterion='entropy', min_samples_leaf=1, min_samples_split=2, random_state=42)
     dt_model.fit(X_train, y_train)
-    
-    # Return the trained model and the feature columns for reindexing input data
-    return dt_model, X.columns
+
+    # Return the trained model and the class labels
+    return dt_model, X.columns, dt_model.classes_
 
 # Train the model (cached)
-model, feature_columns = train_model()
+model, feature_columns, class_labels = train_model()
 
-# Obesity level map (assuming numeric labels)
-# Adjust this map based on the unique values in the 'Obesity' column
+# Create the obesity level map
 obesity_level_map = {
     0: 'Insufficient Weight',
     1: 'Normal Weight',
@@ -49,6 +45,9 @@ obesity_level_map = {
     5: 'Obesity Type II',
     6: 'Obesity Type III'
 }
+
+# Reverse map for encoding
+reverse_obesity_map = {v: k for k, v in obesity_level_map.items()}
 
 st.write("""
 # Obesity Prediction App
@@ -110,17 +109,13 @@ df_input = df_input.reindex(columns=feature_columns, fill_value=0)
 
 # Make a prediction
 prediction = model.predict(df_input)
+predicted_index = prediction[0]  # This is an integer index
 
 # Get the prediction probabilities
 prediction_proba = model.predict_proba(df_input)
 
-# Debugging: Check the shape and contents of prediction and prediction_proba
-st.write("Prediction output:", prediction)
-st.write("Shape of prediction_proba:", prediction_proba.shape)
-st.write("Contents of prediction_proba:", prediction_proba)
-
 # Map prediction to obesity level
-predicted_level = obesity_level_map.get(prediction[0], "Unknown")
+predicted_level = obesity_level_map.get(predicted_index, "Unknown")
 
 # Display results
 st.subheader('Prediction')
@@ -128,11 +123,11 @@ st.write(f'Predicted Obesity Level: {predicted_level}')
 
 # Display prediction probability
 st.subheader('Prediction Probability')
-
-# Access the probability for the predicted class
-predicted_class_proba = prediction_proba[0][prediction[0]]
-
-st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
+try:
+    predicted_class_proba = prediction_proba[0][predicted_index]
+    st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
+except IndexError:
+    st.write("Error: Unable to access probability for the predicted class.")
 
 st.subheader('Class labels and their corresponding index number')
 st.write(obesity_level_map)
