@@ -1,93 +1,87 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import numpy as np
 
-# Title for the app
+# Load pre-trained model
+model = joblib.load('obesity_model.pkl')
+
 st.write("""
-# Obesity Level Prediction App
-This app predicts the **Obesity Level** based on user input features!
+# Obesity Prediction App
+This app predicts the **Obesity Level** based on your inputs!
 """)
 
-# Sidebar for user input parameters
 st.sidebar.header('User Input Parameters')
 
 def user_input_features():
-    # Get user inputs for each feature
-    gender = st.sidebar.selectbox('Gender', ['Male', 'Female'])
-    age = st.sidebar.slider('Age', 10, 100, 25)
-    height = st.sidebar.slider('Height (cm)', 100, 250, 170)
-    weight = st.sidebar.slider('Weight (kg)', 30, 200, 70)
+    # Add sliders or input fields for each feature
+    age = st.sidebar.slider('Age', 10, 80, 30)
+    height = st.sidebar.slider('Height (in cm)', 130, 200, 160)
+    weight = st.sidebar.slider('Weight (in kg)', 30, 150, 70)
     family_history = st.sidebar.selectbox('Family History of Obesity', ['Yes', 'No'])
-    FAVC = st.sidebar.selectbox('Frequent consumption of high calorie food', ['Yes', 'No'])
-    FCVC = st.sidebar.slider('Frequency of vegetable consumption', 1, 10, 5)
-    NCP = st.sidebar.slider('Number of main meals per day', 1, 5, 3)
-    CAEC = st.sidebar.slider('Consumption of food between meals', 1, 10, 5)
-    SMOKE = st.sidebar.selectbox('Smoking', ['Yes', 'No'])
-    CH2O = st.sidebar.slider('Water consumption (l/day)', 1, 10, 2)
-    SCC = st.sidebar.slider('Calories consumption', 1000, 5000, 2000)
-    FAF = st.sidebar.slider('Physical activity frequency (hours/week)', 0, 10, 3)
-    TUE = st.sidebar.slider('Time spent in physical activity (minutes/day)', 0, 300, 60)
-    MTRANS = st.sidebar.selectbox('Transportation', ['Walking', 'Bike', 'Public transport', 'Automobile'])
+    FAVC = st.sidebar.selectbox('Frequent Consumption of High Caloric Food (FAVC)', ['Yes', 'No'])
+    SMOKE = st.sidebar.selectbox('Smokes?', ['Yes', 'No'])
+    SCC = st.sidebar.selectbox('Chronic Disease?', ['Yes', 'No'])
+    
+    # Add other relevant inputs like FAF, MTRANS, CAEC, CALC, etc.
+    FAF = st.sidebar.selectbox('Physical Activity (FAF)', ['Low', 'Medium', 'High'])
+    MTRANS = st.sidebar.selectbox('Mode of Transportation (MTRANS)', ['Walking', 'Bicycle', 'Public', 'Private'])
+    CAEC = st.sidebar.selectbox('Eating Habit (CAEC)', ['Low', 'Medium', 'High'])
+    CALC = st.sidebar.selectbox('Caloric Intake (CALC)', ['Low', 'Medium', 'High'])
 
-    # Map categorical variables to numeric values
-    gender = 1 if gender == 'Male' else 0
-    family_history = 1 if family_history == 'Yes' else 0
-    FAVC = 1 if FAVC == 'Yes' else 0
-    SMOKE = 1 if SMOKE == 'Yes' else 0
-    MTRANS = {'Walking': 0, 'Bike': 1, 'Public transport': 2, 'Automobile': 3}[MTRANS]
-
-    # Create a DataFrame with the user input
     data = {
-        'Gender': gender,
         'Age': age,
         'Height': height,
         'Weight': weight,
         'family_history': family_history,
         'FAVC': FAVC,
-        'FCVC': FCVC,
-        'NCP': NCP,
-        'CAEC': CAEC,
         'SMOKE': SMOKE,
-        'CH2O': CH2O,
         'SCC': SCC,
         'FAF': FAF,
-        'TUE': TUE,
-        'MTRANS': MTRANS
+        'MTRANS': MTRANS,
+        'CAEC': CAEC,
+        'CALC': CALC
     }
+    
     features = pd.DataFrame(data, index=[0])
     return features
 
-# Get the user input
+# Get user input features
 df = user_input_features()
 
-# Show the user input parameters
-st.subheader('User Input parameters')
+st.subheader('User Input Parameters')
 st.write(df)
 
-# Load the pre-trained model (assuming 'obesity_model.pkl' is saved in the current directory)
-try:
-    model = joblib.load('obesity_model.pkl')
-except Exception as e:
-    st.error(f"Error loading model: {e}")
-    st.stop()  # Stop further execution if model cannot be loaded
+# Preprocessing: Encode categorical features as needed
+from sklearn.preprocessing import LabelEncoder
 
-# Make prediction using the loaded model
+le = LabelEncoder()
+df['family_history'] = le.fit_transform(df['family_history'])
+df['FAVC'] = le.fit_transform(df['FAVC'])
+df['SMOKE'] = le.fit_transform(df['SMOKE'])
+df['SCC'] = le.fit_transform(df['SCC'])
+df['FAF'] = le.fit_transform(df['FAF'])
+df['MTRANS'] = le.fit_transform(df['MTRANS'])
+df['CAEC'] = le.fit_transform(df['CAEC'])
+df['CALC'] = le.fit_transform(df['CALC'])
+
+# Model Prediction
 prediction = model.predict(df)
 prediction_proba = model.predict_proba(df)
 
-# Display Obesity Level based on prediction
-obesity_levels = ['Insufficient Weight', 'Normal Weight', 'Overweight Level I', 
-                  'Overweight Level II', 'Obesity Type I', 'Obesity Type II', 'Obesity Type III']
-
-# Show obesity level prediction
+# Display the result
 st.subheader('Prediction')
-st.write(f'Predicted Obesity Level: {obesity_levels[prediction[0]]}')
+st.write(f'Obesity Level: {prediction[0]}')
 
-# Show prediction probabilities
 st.subheader('Prediction Probability')
-proba_df = pd.DataFrame(prediction_proba, columns=obesity_levels)
-st.write(proba_df)
+st.write(prediction_proba)
 
-# Display the classification labels
-st.subheader('Obesity Levels')
+# Optionally, map the predictions to actual obesity levels
+obesity_levels = ['Insufficient Weight', 'Normal Weight', 'Overweight Level I', 'Overweight Level II', 
+                  'Obesity Type I', 'Obesity Type II', 'Obesity Type III']
+
+st.subheader('Class labels and their corresponding index number')
 st.write(obesity_levels)
+
+# Show detailed prediction result with probability
+st.write(f"Probability of the predicted obesity level: {prediction_proba[0][prediction[0]]*100:.2f}%")
