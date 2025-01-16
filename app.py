@@ -114,7 +114,8 @@ prediction = model.predict(df_input)
 # Get the prediction probabilities
 prediction_proba = model.predict_proba(df_input)
 
-# Debugging: Check the shape and contents of prediction_proba
+# Debugging: Check the shape and contents of prediction and prediction_proba
+st.write("Prediction output:", prediction)
 st.write("Shape of prediction_proba:", prediction_proba.shape)
 st.write("Contents of prediction_proba:", prediction_proba)
 
@@ -129,8 +130,11 @@ st.write(f'Predicted Obesity Level: {predicted_level}')
 st.subheader('Prediction Probability')
 
 # Access the probability for the predicted class
-predicted_class_proba = prediction_proba[0][prediction[0]]
-st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
+try:
+    predicted_class_proba = prediction_proba[0][prediction[0]]
+    st.write(f"Probability of the predicted obesity level: {predicted_class_proba * 100:.2f}%")
+except IndexError:
+    st.write("Error: Unable to access probability for the predicted class.")
 
 st.subheader('Class labels and their corresponding index number')
 st.write(obesity_level_map)
