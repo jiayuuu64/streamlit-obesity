@@ -70,7 +70,6 @@ user_input = user_input_features()
 # Display user input in a styled box with emojis
 st.subheader("Your Input Parameters")
 
-# Add Custom CSS for Styling
 st.markdown(
     """
     <style>
@@ -93,7 +92,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Display Inputs in a Nicely Formatted Box with Emojis
 st.markdown(
     f"""
     <div class="input-box">
@@ -127,14 +125,71 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Dummy Model Prediction Logic
-st.subheader("Prediction")
+# Load Dataset
+@st.cache_data
+def load_data():
+    df = pd.read_csv("Obesity prediction.csv")  # Replace with your dataset
+    return df
 
-# Simulated prediction for demonstration
+data = load_data()
+
+# Preprocess the dataset
+def preprocess_data(df):
+    label_encodings = {
+        "Gender": {"Male": 0, "Female": 1},
+        "family_history": {"Yes": 1, "No": 0},
+        "FAVC": {"Yes": 1, "No": 0},
+        "SMOKE": {"Yes": 1, "No": 0},
+        "SCC": {"Yes": 1, "No": 0},
+        "FAF": {"Low": 0, "Medium": 1, "High": 2},
+        "MTRANS": {"Walking": 0, "Public_Transportation": 1, "Automobile": 2, "Bike": 3, "Motorbike": 4},
+        "CAEC": {"No": 0, "Sometimes": 1, "Frequently": 2, "Always": 3},
+        "CALC": {"No": 0, "Sometimes": 1, "Frequently": 2, "Always": 3},
+    }
+    for col, mapping in label_encodings.items():
+        if col in df.columns:
+            df[col] = df[col].map(mapping)
+    return df
+
+data = preprocess_data(data)
+
+# Separate features and target
+X = data.drop(columns=["Obesity"])  # Replace with your target column name
+y = data["Obesity"]  # Replace with your target column name
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train the model
+clf = DecisionTreeClassifier(criterion="entropy", random_state=42)
+clf.fit(X_train, y_train)
+
+# Preprocess user input
+preprocessed_input = preprocess_data(user_input)
+preprocessed_input = preprocessed_input[X_train.columns]
+
+# Make prediction
+prediction = clf.predict(preprocessed_input)[0]
+
+# Map prediction to obesity level labels
+obesity_levels = {
+    "Insufficient_Weight": "Insufficient Weight",
+    "Normal_Weight": "Normal Weight",
+    "Overweight_Level_I": "Overweight Level I",
+    "Overweight_Level_II": "Overweight Level II",
+    "Obesity_Type_I": "Obesity Type I",
+    "Obesity_Type_II": "Obesity Type II",
+    "Obesity_Type_III": "Obesity Type III",
+}
+
+prediction_label = obesity_levels.get(prediction, "Unknown")
+
+# Display Prediction
+st.subheader("Prediction")
 st.markdown(
     f"""
     <div style="padding: 15px; background-color: #e8f5e9; border: 1px solid #d4edda; border-radius: 8px;">
-        🎯 <strong>Predicted Obesity Level:</strong> <span style="color: red;">Normal Weight</span>
+        🎯 <strong>Predicted Obesity Level:</strong> <span style="color: red;">{prediction_label}</span>
     </div>
     """,
     unsafe_allow_html=True,
