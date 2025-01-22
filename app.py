@@ -1,12 +1,11 @@
 import streamlit as st
 import pandas as pd
+import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 
-# Title
 st.title("Obesity Prediction App")
 
-# Sidebar for user input
 st.sidebar.header("User Input Parameters")
 
 def user_input_features():
@@ -30,7 +29,7 @@ def user_input_features():
     data = {
         "Gender": gender,
         "Age": age,
-        "Height": height / 100,  # Convert to meters
+        "Height": height / 100,  # Convert cm to meters
         "Weight": weight,
         "family_history": family_history,
         "FAVC": favc,
@@ -72,60 +71,45 @@ def preprocess_data(df):
             df[col] = df[col].map(mapping)
     return df
 
-# Load dataset
-@st.cache_data
-def load_data():
-    df = pd.read_csv("Obesity prediction.csv")  # Replace with your dataset filename
-    return df
-
-data = load_data()
-
-# Preprocess the dataset
-data = preprocess_data(data)
-
-# Separate features and target
-X = data.drop(columns=["Obesity"])  # Replace 'Obesity' with your target column name
-y = data["Obesity"]
-
-# Split into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Train the model
-clf = RandomForestClassifier(random_state=42)
-clf.fit(X_train, y_train)
-
 # Preprocess user input
 preprocessed_input = preprocess_data(user_input)
 
 # Ensure column order matches training data
-preprocessed_input = preprocessed_input[X_train.columns]
+@st.cache_data
+def load_model():
+    return joblib.load("obesity_model.pkl")
 
-# Make predictions
 try:
+    # Load pre-trained model
+    clf = load_model()
+
+    # Ensure column order matches the model's training data
+    preprocessed_input = preprocessed_input[clf.feature_names_in_]
+
+    # Make predictions
     prediction = clf.predict(preprocessed_input)[0]
     prediction_proba = clf.predict_proba(preprocessed_input)[0]
+
+    # Map prediction to obesity level labels
+    obesity_levels = {
+        "Insufficient_Weight": "Insufficient Weight",
+        "Normal_Weight": "Normal Weight",
+        "Overweight_Level_I": "Overweight Level I",
+        "Overweight_Level_II": "Overweight Level II",
+        "Obesity_Type_I": "Obesity Type I",
+        "Obesity_Type_II": "Obesity Type II",
+        "Obesity_Type_III": "Obesity Type III",
+    }
+
+    prediction_label = obesity_levels.get(prediction, "Unknown")
+
+    # Display prediction
+    st.subheader("Prediction")
+    st.write(f"Predicted Obesity Level: {prediction_label}")
+
+    # Display prediction probability
+    st.subheader("Prediction Probability")
+    for level, prob in zip(clf.classes_, prediction_proba):
+        st.write(f"{obesity_levels.get(level, level)}: {prob * 100:.2f}%")
 except Exception as e:
-    st.error(f"Prediction Error: {e}")
-    st.stop()
-
-# Map prediction to obesity level labels
-obesity_levels = {
-    "Insufficient_Weight": "Insufficient Weight",
-    "Normal_Weight": "Normal Weight",
-    "Overweight_Level_I": "Overweight Level I",
-    "Overweight_Level_II": "Overweight Level II",
-    "Obesity_Type_I": "Obesity Type I",
-    "Obesity_Type_II": "Obesity Type II",
-    "Obesity_Type_III": "Obesity Type III",
-}
-
-prediction_label = obesity_levels.get(prediction, "Unknown")
-
-# Display prediction
-st.subheader("Prediction")
-st.write(f"Predicted Obesity Level: {prediction_label}")
-
-# Display prediction probability
-st.subheader("Prediction Probability")
-for level, prob in zip(clf.classes_, prediction_proba):
-    st.write(f"{obesity_levels.get(level, level)}: {prob * 100:.2f}%")
+    st.error(f"Error: {e}")
