@@ -1,23 +1,36 @@
 import streamlit as st
 import pandas as pd
+import altair as alt
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
-st.title("Obesity Prediction App")
+# App Header
+st.title("Obesity Prediction App 🎯")
+st.markdown("""
+This app predicts **obesity levels** based on your health and lifestyle inputs.  
+Use the sidebar to enter your details, and view the prediction results below.
+""")
+st.markdown("---")
 
+# Sidebar
 st.sidebar.header("User Input Parameters")
 
 def user_input_features():
+    st.sidebar.markdown("### Personal Information")
     gender = st.sidebar.selectbox("Gender", ["Male", "Female"])
     age = st.sidebar.slider("Age", 10, 80, 30)
     height = st.sidebar.slider("Height (in cm)", 130, 200, 170)
     weight = st.sidebar.slider("Weight (in kg)", 30, 150, 70)
+
+    st.sidebar.markdown("### Lifestyle Choices")
     family_history = st.sidebar.selectbox("Family History of Obesity", ["Yes", "No"])
     favc = st.sidebar.selectbox("Frequent Consumption of High Caloric Food (FAVC)", ["Yes", "No"])
     smoke = st.sidebar.selectbox("Smokes?", ["Yes", "No"])
     scc = st.sidebar.selectbox("Monitor Calories (SCC)?", ["Yes", "No"])
     faf = st.sidebar.selectbox("Physical Activity (FAF)", ["Low", "Medium", "High"])
     mtrans = st.sidebar.selectbox("Mode of Transportation (MTRANS)", ["Walking", "Public_Transportation", "Automobile", "Bike", "Motorbike"])
+
+    st.sidebar.markdown("### Eating Habits")
     caec = st.sidebar.selectbox("Eating Habit (CAEC)", ["No", "Sometimes", "Frequently", "Always"])
     calc = st.sidebar.selectbox("Caloric Intake (CALC)", ["No", "Sometimes", "Frequently", "Always"])
     fcvc = st.sidebar.slider("Frequency of Consumption of Vegetables (FCVC)", 1, 3, 2)
@@ -28,7 +41,7 @@ def user_input_features():
     data = {
         "Gender": gender,
         "Age": age,
-        "Height": height / 100,  
+        "Height": height / 100,  # Convert cm to meters
         "Weight": weight,
         "family_history": family_history,
         "FAVC": favc,
@@ -121,9 +134,32 @@ prediction_label = obesity_levels.get(prediction, "Unknown")
 
 # Display prediction
 st.subheader("Prediction")
-st.write(f"Predicted Obesity Level: {prediction_label}")
+st.write(f"Predicted Obesity Level: **{prediction_label}**")
 
-# Display prediction probability
+# Display prediction probability using a bar chart
 st.subheader("Prediction Probability")
-for level, prob in zip(clf.classes_, prediction_proba):
-    st.write(f"{obesity_levels.get(level, level)}: {prob * 100:.2f}%")
+probability_df = pd.DataFrame({
+    "Obesity Level": [obesity_levels.get(level, level) for level in clf.classes_],
+    "Probability (%)": prediction_proba * 100,
+})
+chart = alt.Chart(probability_df).mark_bar().encode(
+    x=alt.X("Probability (%):Q", title="Probability (%)"),
+    y=alt.Y("Obesity Level:N", sort="-x", title="Obesity Level"),
+    color=alt.Color("Obesity Level:N", legend=None),
+)
+st.altair_chart(chart, use_container_width=True)
+
+# Scatter Plot: Predicted vs Actual
+st.subheader("Scatter Plot: Predicted vs Actual")
+scatter_df = pd.DataFrame({
+    "Actual": y_test,
+    "Predicted": clf.predict(X_test),
+})
+scatter_chart = alt.Chart(scatter_df).mark_circle(size=60).encode(
+    x=alt.X("Actual:N", title="Actual Obesity Level"),
+    y=alt.Y("Predicted:N", title="Predicted Obesity Level"),
+    color=alt.Color("Actual:N", legend=None),
+).interactive()
+st.altair_chart(scatter_chart, use_container_width=True)
+
+st.success("Prediction complete! 🎉")
