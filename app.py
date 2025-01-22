@@ -13,6 +13,7 @@ st.markdown("""
 This app predicts **obesity levels** based on your health and lifestyle inputs.  
 Use the sidebar to enter your details, and view the prediction results below.  
 """)
+
 st.markdown("---")
 
 # Sidebar
