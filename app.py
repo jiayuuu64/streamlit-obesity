@@ -18,7 +18,7 @@ st.markdown(
     """
     <style>
     .stApp {
-        background-image: url("weight.jpg");
+        background-image: url("imsage/weight.jpg");
         background-size: cover;
         background-position: center;
     }
