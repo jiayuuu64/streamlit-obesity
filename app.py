@@ -4,6 +4,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 import base64
 
+# Set the page configuration (must be first)
+st.set_page_config(page_title="Obesity Prediction App", layout="wide")
 
 # Function to encode an image to base64
 def encode_image_to_base64(image_path):
@@ -25,18 +27,16 @@ def add_bg_from_local(encoded_image):
     )
 
 # Call function to add background
-image_path = "weight.jpg"  
+image_path = "weight.jpg"  # Replace with the path to your background image
 encoded_image = encode_image_to_base64(image_path)
 add_bg_from_local(encoded_image)
 
 # App Header
-st.set_page_config(page_title="Obesity Prediction App", layout="wide")
 st.title("Obesity Prediction App 🎯")
 st.markdown("""
 This app predicts **obesity levels** based on your health and lifestyle inputs.  
 Enter your details in the sidebar to get predictions below.  
 """)
-
 
 st.markdown("---")
 
