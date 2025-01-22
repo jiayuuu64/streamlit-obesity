@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
+import matplotlib.pyplot as plt
 
 # App Header
 st.title("Obesity Prediction App 🎯")
@@ -61,15 +62,90 @@ user_input = user_input_features()
 st.subheader("User Input Parameters")
 st.write(user_input)
 
-# Example Prediction Section (Model loading and predictions remain unchanged)
-st.subheader("Prediction")
-st.write("Predicted Obesity Level: Overweight Level II")  # Example placeholder prediction
+# Preprocess the dataset
+def preprocess_data(df):
+    label_encodings = {
+        "Gender": {"Male": 0, "Female": 1},
+        "family_history": {"Yes": 1, "No": 0},
+        "FAVC": {"Yes": 1, "No": 0},
+        "SMOKE": {"Yes": 1, "No": 0},
+        "SCC": {"Yes": 1, "No": 0},
+        "FAF": {"Low": 0, "Medium": 1, "High": 2},
+        "MTRANS": {"Walking": 0, "Public_Transportation": 1, "Automobile": 2, "Bike": 3, "Motorbike": 4},
+        "CAEC": {"No": 0, "Sometimes": 1, "Frequently": 2, "Always": 3},
+        "CALC": {"No": 0, "Sometimes": 1, "Frequently": 2, "Always": 3},
+    }
+    for col, mapping in label_encodings.items():
+        if col in df.columns:
+            df[col] = df[col].map(mapping)
+    return df
 
-# Example Visualization
+# Load dataset
+@st.cache_data
+def load_data():
+    df = pd.read_csv("Obesity prediction.csv") 
+    return df
+
+data = load_data()
+
+# Preprocess the dataset
+data = preprocess_data(data)
+
+# Separate features and target
+X = data.drop(columns=["Obesity"]) 
+y = data["Obesity"]
+
+# Split into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train the Decision Tree model
+clf = DecisionTreeClassifier(criterion="entropy", random_state=42)
+clf.fit(X_train, y_train)
+
+# Preprocess user input
+preprocessed_input = preprocess_data(user_input)
+
+# Ensure column order matches training data
+preprocessed_input = preprocessed_input[X_train.columns]
+
+# Make predictions
+try:
+    prediction = clf.predict(preprocessed_input)[0]
+    prediction_proba = clf.predict_proba(preprocessed_input)[0]
+except Exception as e:
+    st.error(f"Prediction Error: {e}")
+    st.stop()
+
+# Map prediction to obesity level labels
+obesity_levels = {
+    "Insufficient_Weight": "Insufficient Weight",
+    "Normal_Weight": "Normal Weight",
+    "Overweight_Level_I": "Overweight Level I",
+    "Overweight_Level_II": "Overweight Level II",
+    "Obesity_Type_I": "Obesity Type I",
+    "Obesity_Type_II": "Obesity Type II",
+    "Obesity_Type_III": "Obesity Type III",
+}
+
+prediction_label = obesity_levels.get(prediction, "Unknown")
+
+# Display prediction
+st.subheader("Prediction")
+st.write(f"Predicted Obesity Level: {prediction_label}")
+
+# Display prediction probability
 st.subheader("Prediction Probability")
 st.markdown("### Here's how likely you are to belong to each obesity category:")
-fig, ax = plt.subplots()
-ax.bar(["Insufficient", "Normal", "Overweight I", "Overweight II", "Obesity I", "Obesity II", "Obesity III"], [5, 10, 15, 70, 5, 3, 2])
-st.pyplot(fig)
-st.success("Prediction complete!")
+try:
+    fig, ax = plt.subplots()
+    ax.bar(obesity_levels.values(), prediction_proba * 100, color="skyblue")
+    ax.set_ylabel("Probability (%)")
+    ax.set_title("Obesity Level Prediction Probability")
+    ax.set_xticklabels(obesity_levels.values(), rotation=45, ha="right")
+    st.pyplot(fig)
+except Exception as e:
+    st.error(f"Error creating the plot: {e}")
+
+# Add Feedback
+st.success("Prediction complete! 🎉")
 st.balloons()
