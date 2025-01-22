@@ -20,6 +20,7 @@ def add_bg_from_local(encoded_image):
         .stApp {{
             background: url("data:image/png;base64,{encoded_image}");
             background-size: cover;
+            text-align: center; /* Align everything to center */
         }}
         </style>
         """,
@@ -35,40 +36,37 @@ add_bg_from_local(encoded_image)
 st.markdown(
     """
     <style>
-    /* Main content font color */
-    .stApp {
-        color: white;
-    }
-    /* Sidebar styling */
-    section[data-testid="stSidebar"] {
-        color: black !important;
-        background-color: #f8f9fa; /* Sidebar background color */
-    }
     .textbox {
-        background-color: rgba(0, 0, 0, 0.75); /* Darker semi-transparent black */
+        background-color: rgba(0, 0, 0, 0.75);
         padding: 15px 20px;
-        border-radius: 15px; /* Rounded corners for smoother edges */
-        margin-bottom: 10px; /* Reduced space between boxes */
-        width: fit-content; /* Auto adjust width to content */
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Lighter shadow for smoother transition */
+        border-radius: 15px;
+        margin-bottom: 10px;
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        color: white;
+        text-align: center;
     }
     .input-box {
         padding: 20px;
-        background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
-        border-radius: 15px; /* Rounded corners for smoother edges */
-        border: none; /* Remove border for a seamless look */
-        margin-bottom: 10px; /* Reduced space between boxes */
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        background-color: rgba(0, 0, 0, 0.7);
+        border-radius: 15px;
+        border: none;
+        margin-bottom: 10px;
+        margin-left: auto;
+        margin-right: auto;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         font-family: Arial, sans-serif;
         line-height: 1.6;
-        color: white; /* Ensure text is readable */
+        color: white;
+        text-align: left;
     }
     .input-section-header {
         font-weight: bold;
         margin-bottom: 10px;
         font-size: 18px;
-        color: white; /* Section headers */
-        text-decoration: underline; /* Optional underline for section headers */
+        text-decoration: underline;
     }
     </style>
     """,
@@ -80,18 +78,7 @@ st.markdown(
     """
     <div class="textbox">
         <h1>Obesity Prediction App 🎯</h1>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-st.markdown(
-    """
-    <div class="textbox">
-        <p>
-        This app predicts <strong>obesity levels</strong> based on your health and lifestyle inputs.<br>
-        Enter your details in the sidebar to get predictions below.
-        </p>
+        <p>This app predicts <strong>obesity levels</strong> based on your health and lifestyle inputs. Enter your details in the sidebar to get predictions below.</p>
     </div>
     """,
     unsafe_allow_html=True,
@@ -280,6 +267,7 @@ st.markdown(
         background-color: rgba(0, 0, 0, 0.7); 
         border-radius: 15px; 
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); 
+        text-align: center;
     ">
         🎯 <strong style="font-size: 24px;">Predicted Obesity Level:</strong> 
         <span style="font-size: 28px; color: {prediction_color};">{prediction_label}</span>
