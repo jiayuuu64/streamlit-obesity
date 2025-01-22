@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
+import base64
 
 
 # Function to encode an image to base64
@@ -24,7 +25,7 @@ def add_bg_from_local(encoded_image):
     )
 
 # Call function to add background
-image_path = "weight.jpg"  # Replace with the path to your background image
+image_path = "weight.jpg"  
 encoded_image = encode_image_to_base64(image_path)
 add_bg_from_local(encoded_image)
 
