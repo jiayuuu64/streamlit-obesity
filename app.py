@@ -3,6 +3,9 @@ import pandas as pd
 import altair as alt
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # App Header
 st.set_page_config(page_title="Obesity Prediction App", layout="wide")
@@ -119,7 +122,6 @@ preprocessed_input = preprocessed_input[X_train.columns]
 # Make predictions
 try:
     prediction = clf.predict(preprocessed_input)[0]
-    prediction_proba = clf.predict_proba(preprocessed_input)[0]
 except Exception as e:
     st.error(f"Prediction Error: {e}")
     st.stop()
@@ -141,19 +143,18 @@ prediction_label = obesity_levels.get(prediction, "Unknown")
 st.subheader("Prediction")
 st.markdown(f"<h3 style='color: blue;'>Predicted Obesity Level: {prediction_label}</h3>", unsafe_allow_html=True)
 
-# Display prediction probability using a bar chart
-st.subheader("Prediction Probability")
-probability_df = pd.DataFrame({
-    "Obesity Level": [obesity_levels.get(level, level) for level in clf.classes_],
-    "Probability (%)": prediction_proba * 100,
-})
-chart = alt.Chart(probability_df).mark_bar().encode(
-    x=alt.X("Probability (%):Q", title="Probability (%)"),
-    y=alt.Y("Obesity Level:N", sort="-x", title="Obesity Level"),
-    color=alt.Color("Obesity Level:N", legend=None),
-)
-st.altair_chart(chart, use_container_width=True)
+# Show confusion matrix (performance of the model on test data)
+st.subheader("Model Performance (Confusion Matrix)")
+
+y_pred = clf.predict(X_test)
+cm = confusion_matrix(y_test, y_pred)
+
+# Plot confusion matrix using seaborn
+fig, ax = plt.subplots(figsize=(6, 6))
+sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=obesity_levels.values(), yticklabels=obesity_levels.values())
+plt.xlabel('Predicted')
+plt.ylabel('True')
+st.pyplot(fig)
 
 # Footer
 st.markdown("---")
-st.markdown("Built with ❤️ using Streamlit")
