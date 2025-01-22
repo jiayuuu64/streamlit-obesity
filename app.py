@@ -256,6 +256,12 @@ obesity_levels = {
 
 prediction_label = obesity_levels.get(prediction, "Unknown")
 
+# Determine text color based on prediction
+if prediction_label == "Normal Weight":
+    prediction_color = "green"  # Green for Normal Weight
+else:
+    prediction_color = "red"  # Red for all other obesity levels
+
 # Display Prediction Header
 st.markdown(
     """
@@ -269,8 +275,15 @@ st.markdown(
 # Display Prediction Result
 st.markdown(
     f"""
-    <div class="input-box">
-        🎯 <strong>Predicted Obesity Level:</strong> <span style="color: lightcoral;">{prediction_label}</span>
+    <div style="
+        padding: 20px; 
+        background-color: rgba(0, 0, 0, 0.7); 
+        border-radius: 15px; 
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); 
+        text-align: center;
+    ">
+        🎯 <strong style="font-size: 24px;">Predicted Obesity Level:</strong> 
+        <span style="font-size: 28px; color: {prediction_color};">{prediction_label}</span>
     </div>
     """,
     unsafe_allow_html=True,
