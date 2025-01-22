@@ -1,13 +1,14 @@
 import streamlit as st
 import pandas as pd
 import joblib
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
 
+# App title
 st.title("Obesity Prediction App")
 
+# Sidebar for user input
 st.sidebar.header("User Input Parameters")
 
+# Function to collect user input
 def user_input_features():
     gender = st.sidebar.selectbox("Gender", ["Male", "Female"])
     age = st.sidebar.slider("Age", 10, 80, 30)
@@ -18,7 +19,10 @@ def user_input_features():
     smoke = st.sidebar.selectbox("Smokes?", ["Yes", "No"])
     scc = st.sidebar.selectbox("Monitor Calories (SCC)?", ["Yes", "No"])
     faf = st.sidebar.selectbox("Physical Activity (FAF)", ["Low", "Medium", "High"])
-    mtrans = st.sidebar.selectbox("Mode of Transportation (MTRANS)", ["Walking", "Public_Transportation", "Automobile", "Bike", "Motorbike"])
+    mtrans = st.sidebar.selectbox(
+        "Mode of Transportation (MTRANS)", 
+        ["Walking", "Public_Transportation", "Automobile", "Bike", "Motorbike"]
+    )
     caec = st.sidebar.selectbox("Eating Habit (CAEC)", ["No", "Sometimes", "Frequently", "Always"])
     calc = st.sidebar.selectbox("Caloric Intake (CALC)", ["No", "Sometimes", "Frequently", "Always"])
     fcvc = st.sidebar.slider("Frequency of Consumption of Vegetables (FCVC)", 1, 3, 2)
@@ -53,7 +57,7 @@ user_input = user_input_features()
 st.subheader("User Input Parameters")
 st.write(user_input)
 
-# Preprocess the dataset
+# Preprocessing function
 def preprocess_data(df):
     label_encodings = {
         "Gender": {"Male": 0, "Female": 1},
@@ -74,16 +78,17 @@ def preprocess_data(df):
 # Preprocess user input
 preprocessed_input = preprocess_data(user_input)
 
-# Ensure column order matches training data
+# Function to load the model
 @st.cache_data
 def load_model():
     return joblib.load("obesity_model.pkl")
 
+# Prediction block
 try:
     # Load pre-trained model
     clf = load_model()
 
-    # Ensure column order matches the model's training data
+    # Ensure column order matches the training data
     preprocessed_input = preprocessed_input[clf.feature_names_in_]
 
     # Make predictions
