@@ -48,17 +48,17 @@ st.markdown(
         background-color: rgba(0, 0, 0, 0.75); /* Darker semi-transparent black */
         padding: 15px 20px;
         border-radius: 15px; /* Rounded corners for smoother edges */
-        margin-bottom: 20px; /* Add space between boxes */
+        margin-bottom: 10px; /* Reduced space between boxes */
         width: fit-content; /* Auto adjust width to content */
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Lighter shadow for smoother transition */
     }
     .input-box {
         padding: 20px;
         background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
         border-radius: 15px; /* Rounded corners for smoother edges */
-        border: 1px solid #444; /* Subtle border */
-        margin-bottom: 20px; /* Space below each section */
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+        border: none; /* Remove border for a seamless look */
+        margin-bottom: 10px; /* Reduced space between boxes */
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
         font-family: Arial, sans-serif;
         line-height: 1.6;
         color: white; /* Ensure text is readable */
