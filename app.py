@@ -280,7 +280,6 @@ st.markdown(
         background-color: rgba(0, 0, 0, 0.7); 
         border-radius: 15px; 
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); 
-        text-align: center;
     ">
         🎯 <strong style="font-size: 24px;">Predicted Obesity Level:</strong> 
         <span style="font-size: 28px; color: {prediction_color};">{prediction_label}</span>
