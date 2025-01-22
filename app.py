@@ -67,29 +67,38 @@ def user_input_features():
 
 user_input = user_input_features()
 
-# Display user input in a more readable format
+# Display user input in a nicer, side-by-side format
 st.subheader("Your Input Parameters")
-st.markdown("### Personal Information")
-st.markdown(f"**Gender**: {user_input['Gender'][0]}")
-st.markdown(f"**Age**: {user_input['Age'][0]} years")
-st.markdown(f"**Height**: {user_input['Height'][0] * 100} cm")  # Convert height back to cm
-st.markdown(f"**Weight**: {user_input['Weight'][0]} kg")
+col1, col2 = st.columns(2)
 
-st.markdown("### Lifestyle Choices")
-st.markdown(f"**Family History of Obesity**: {user_input['family_history'][0]}")
-st.markdown(f"**Frequent Consumption of High Caloric Food (FAVC)**: {user_input['FAVC'][0]}")
-st.markdown(f"**Smokes**: {user_input['SMOKE'][0]}")
-st.markdown(f"**Monitor Calories (SCC)**: {user_input['SCC'][0]}")
-st.markdown(f"**Physical Activity Level (FAF)**: {user_input['FAF'][0]}")
-st.markdown(f"**Mode of Transportation (MTRANS)**: {user_input['MTRANS'][0]}")
+with col1:
+    st.markdown("### Personal Information")
+    st.markdown(f"**Gender**: {user_input['Gender'][0]}")
+    st.markdown(f"**Age**: {user_input['Age'][0]} years")
+    st.markdown(f"**Height**: {user_input['Height'][0] * 100} cm")  # Convert height back to cm
+    st.markdown(f"**Weight**: {user_input['Weight'][0]} kg")
+
+with col2:
+    st.markdown("### Lifestyle Choices")
+    st.markdown(f"**Family History of Obesity**: {user_input['family_history'][0]}")
+    st.markdown(f"**Frequent Consumption of High Caloric Food (FAVC)**: {user_input['FAVC'][0]}")
+    st.markdown(f"**Smokes**: {user_input['SMOKE'][0]}")
+    st.markdown(f"**Monitor Calories (SCC)**: {user_input['SCC'][0]}")
+    st.markdown(f"**Physical Activity Level (FAF)**: {user_input['FAF'][0]}")
+    st.markdown(f"**Mode of Transportation (MTRANS)**: {user_input['MTRANS'][0]}")
 
 st.markdown("### Eating Habits")
-st.markdown(f"**Eating Habit (CAEC)**: {user_input['CAEC'][0]}")
-st.markdown(f"**Caloric Intake (CALC)**: {user_input['CALC'][0]}")
-st.markdown(f"**Frequency of Vegetables Consumption (FCVC)**: {user_input['FCVC'][0]}")
-st.markdown(f"**Number of Meals per Day (NCP)**: {user_input['NCP'][0]}")
-st.markdown(f"**Daily Water Consumption (CH2O)**: {user_input['CH2O'][0]} liters")
-st.markdown(f"**Time Using Technology (TUE)**: {user_input['TUE'][0]} hours")
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown(f"**Eating Habit (CAEC)**: {user_input['CAEC'][0]}")
+    st.markdown(f"**Caloric Intake (CALC)**: {user_input['CALC'][0]}")
+    st.markdown(f"**Frequency of Vegetables Consumption (FCVC)**: {user_input['FCVC'][0]}")
+
+with col2:
+    st.markdown(f"**Number of Meals per Day (NCP)**: {user_input['NCP'][0]}")
+    st.markdown(f"**Daily Water Consumption (CH2O)**: {user_input['CH2O'][0]} liters")
+    st.markdown(f"**Time Using Technology (TUE)**: {user_input['TUE'][0]} hours")
 
 # Preprocess the dataset
 def preprocess_data(df):
@@ -159,7 +168,4 @@ prediction_label = obesity_levels.get(prediction, "Unknown")
 
 # Display prediction
 st.subheader("Prediction")
-st.markdown(f"<h3 style='color: blue;'>Predicted Obesity Level: {prediction_label}</h3>", unsafe_allow_html=True)
-
-# Footer
-st.markdown("---")
+st.markdown(f"<h3 style='color: blue;'>Predicted Obesity Level: <span style='color: red;'>{prediction_label}</span></h3>", unsafe_allow_html=True)
