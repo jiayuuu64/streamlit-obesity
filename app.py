@@ -11,9 +11,8 @@ st.set_page_config(page_title="Obesity Prediction App", layout="wide")
 st.title("Obesity Prediction App 🎯")
 st.markdown("""
 This app predicts **obesity levels** based on your health and lifestyle inputs.  
-Use the sidebar to enter your details, and view the prediction results below.  
+Use the sidebar to enter your details, and view the prediction results below.
 """)
-
 st.markdown("---")
 
 # Sidebar
@@ -23,6 +22,7 @@ Enter your details in the fields below and click the button to get predictions.
 """)
 
 def user_input_features():
+    """Get user inputs from the sidebar."""
     st.sidebar.markdown("### Personal Information")
     gender = st.sidebar.selectbox("Gender", ["Male", "Female"])
     age = st.sidebar.slider("Age", 10, 80, 30)
@@ -45,6 +45,7 @@ def user_input_features():
     ch2o = st.sidebar.slider("Daily Water Consumption (CH2O in liters)", 1, 3, 2)
     tue = st.sidebar.slider("Time Using Technology (TUE in hours)", 0, 2, 1)
 
+    # Return a DataFrame with the input features
     data = {
         "Gender": gender,
         "Age": age,
@@ -63,8 +64,7 @@ def user_input_features():
         "CH2O": ch2o,
         "TUE": tue,
     }
-    features = pd.DataFrame(data, index=[0])
-    return features
+    return pd.DataFrame(data, index=[0])
 
 user_input = user_input_features()
 
@@ -74,6 +74,7 @@ st.write(user_input)
 
 # Preprocess the dataset
 def preprocess_data(df):
+    """Preprocess data by encoding categorical columns."""
     label_encodings = {
         "Gender": {"Male": 0, "Female": 1},
         "family_history": {"Yes": 1, "No": 0},
@@ -93,8 +94,8 @@ def preprocess_data(df):
 # Load dataset
 @st.cache_data
 def load_data():
-    df = pd.read_csv("Obesity prediction.csv") 
-    return df
+    """Load obesity prediction dataset."""
+    return pd.read_csv("Obesity prediction.csv")
 
 data = load_data()
 
