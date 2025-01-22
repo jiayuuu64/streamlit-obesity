@@ -35,29 +35,35 @@ add_bg_from_local(encoded_image)
 st.markdown(
     """
     <style>
+    /* Main content font color */
     .stApp {
-        color: white; /* Changes the default text color to white */
+        color: white;
+    }
+    /* Sidebar styling: preserves default colors */
+    section[data-testid="stSidebar"] {
+        color: black !important;
+        background-color: #f8f9fa; /* Use the previous background color */
     }
     .textbox {
-        background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background for textboxes */
+        background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
         padding: 10px;
         border-radius: 8px;
         display: inline-block;
     }
     .input-box {
         padding: 15px;
-        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background for better readability */
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background for input display */
         border: 1px solid #dcdcdc;
         border-radius: 8px;
         font-family: Arial, sans-serif;
         line-height: 1.6;
-        color: white; /* Makes the text inside the input box white */
+        color: white; /* Ensure white font inside input box */
     }
     .input-section-header {
         font-weight: bold;
         margin-bottom: 10px;
         font-size: 16px;
-        color: white; /* Ensures section headers are white */
+        color: white; /* Section headers inside input box */
     }
     </style>
     """,
@@ -142,7 +148,7 @@ def user_input_features():
 
 user_input = user_input_features()
 
-# Display user input in a styled box with emojis
+# Display user input in a styled box
 st.markdown(
     f"""
     <div class="textbox">
@@ -244,8 +250,17 @@ obesity_levels = {
 
 prediction_label = obesity_levels.get(prediction, "Unknown")
 
-# Display Prediction
-st.subheader("Prediction")
+# Display Prediction Header with Textbox
+st.markdown(
+    """
+    <div class="textbox">
+        <h3>Prediction</h3>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Display Prediction Result
 st.markdown(
     f"""
     <div style="padding: 15px; background-color: rgba(0, 0, 0, 0.7); border: 1px solid #d4edda; border-radius: 8px; color: white;">
