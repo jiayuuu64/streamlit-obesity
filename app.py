@@ -31,6 +31,33 @@ image_path = "feet.jpg"  # Replace with the path to your background image
 encoded_image = encode_image_to_base64(image_path)
 add_bg_from_local(encoded_image)
 
+# Add CSS to change font color to white
+st.markdown(
+    """
+    <style>
+    .stApp {
+        color: white; /* Changes the default text color to white */
+    }
+    .input-box {
+        padding: 15px;
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background for better readability */
+        border: 1px solid #dcdcdc;
+        border-radius: 8px;
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: white; /* Makes the text inside the input box white */
+    }
+    .input-section-header {
+        font-weight: bold;
+        margin-bottom: 10px;
+        font-size: 16px;
+        color: white; /* Ensures section headers are white */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 # App Header
 st.title("Obesity Prediction App 🎯")
 st.markdown("""
@@ -96,29 +123,6 @@ user_input = user_input_features()
 
 # Display user input in a styled box with emojis
 st.subheader("Your Input Parameters")
-
-st.markdown(
-    """
-    <style>
-    .input-box {
-        padding: 15px;
-        background-color: #f8f9fa;
-        border: 1px solid #dcdcdc;
-        border-radius: 8px;
-        font-family: Arial, sans-serif;
-        line-height: 1.6;
-    }
-    .input-section-header {
-        font-weight: bold;
-        margin-bottom: 10px;
-        font-size: 16px;
-        color: #333333;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
 st.markdown(
     f"""
     <div class="input-box">
@@ -215,8 +219,8 @@ prediction_label = obesity_levels.get(prediction, "Unknown")
 st.subheader("Prediction")
 st.markdown(
     f"""
-    <div style="padding: 15px; background-color: #e8f5e9; border: 1px solid #d4edda; border-radius: 8px;">
-        🎯 <strong>Predicted Obesity Level:</strong> <span style="color: red;">{prediction_label}</span>
+    <div style="padding: 15px; background-color: rgba(0, 0, 0, 0.7); border: 1px solid #d4edda; border-radius: 8px; color: white;">
+        🎯 <strong>Predicted Obesity Level:</strong> <span style="color: lightcoral;">{prediction_label}</span>
     </div>
     """,
     unsafe_allow_html=True,
