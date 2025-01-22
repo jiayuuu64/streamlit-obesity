@@ -20,7 +20,7 @@ def add_bg_from_local(encoded_image):
         .stApp {{
             background: url("data:image/png;base64,{encoded_image}");
             background-size: cover;
-            text-align: center;
+            text-align: center; /* Align everything to center */
         }}
         </style>
         """,
@@ -94,90 +94,34 @@ st.sidebar.markdown("""Enter your details below. Your inputs will be used to pre
 def user_input_features():
     # Personal Information Section
     with st.sidebar.expander("Personal Information", expanded=True):
-        gender = st.selectbox("Gender: Gender", ["Male", "Female"], help="Gender: Select your gender.")
-        age = st.slider("Age: Age", 10, 80, 30, help="Age: Enter your age.")
-        height = st.slider("Height: in metres", 1.45, 1.98, 1.70, help="Height: Enter your height in meters.")
-        weight = st.slider("Weight: in kgs", 39.0, 173.0, 70.0, help="Weight: Enter your weight in kilograms.")
+        gender = st.selectbox("Gender", ["Male", "Female"], help="Select your gender.")
+        age = st.slider("Age", 10, 80, 30, help="Select your age.")
+        height = st.slider("Height (in cm)", 130, 198, 170, help="Select your height in cm.")
+        weight = st.slider("Weight (in kg)", 30, 173, 70, help="Select your weight in kg.")
 
     # Lifestyle Choices Section
     with st.sidebar.expander("Lifestyle Choices"):
-        family_history = st.selectbox(
-            "family_history : Has a family member suffered or suffers from overweight?", 
-            ["Yes", "No"], 
-            help="Has a family member suffered or suffers from overweight?"
-        )
-        favc = st.selectbox(
-            "FAVC : Do you eat high caloric food frequently?", 
-            ["Yes", "No"], 
-            help="Do you frequently consume high-calorie foods?"
-        )
-        smoke = st.selectbox(
-            "SMOKE : Do you smoke?", 
-            ["Yes", "No"], 
-            help="Do you smoke regularly?"
-        )
-        scc = st.selectbox(
-            "SCC : Do you monitor the calories you eat daily?", 
-            ["Yes", "No"], 
-            help="Do you monitor your calorie intake daily?"
-        )
-        faf = st.selectbox(
-            "FAF : How often do you have physical activity?", 
-            ["Low", "Medium", "High"], 
-            help="How often do you engage in physical activity?"
-        )
-        mtrans = st.selectbox(
-            "MTRANS : Which transportation do you usually use?", 
-            ["Walking", "Public_Transportation", "Automobile", "Bike", "Motorbike"], 
-            help="Which type of transportation do you most frequently use?"
-        )
+        family_history = st.selectbox("Family History of Obesity", ["Yes", "No"], help="Do you have a family history of obesity?")
+        favc = st.selectbox("Frequent Consumption of High Caloric Food (FAVC)", ["Yes", "No"], help="Do you frequently consume high-calorie foods?")
+        smoke = st.selectbox("Smokes?", ["Yes", "No"], help="Do you smoke?")
+        scc = st.selectbox("Monitor Calories (SCC)?", ["Yes", "No"], help="Do you monitor your calorie intake?")
+        faf = st.selectbox("Physical Activity (FAF)", ["Low", "Medium", "High"], help="What is your level of physical activity?")
+        mtrans = st.selectbox("Mode of Transportation (MTRANS)", ["Walking", "Public_Transportation", "Automobile", "Bike", "Motorbike"], help="How do you typically commute?")
 
     # Eating Habits Section
     with st.sidebar.expander("Eating Habits"):
-        caec = st.selectbox(
-            "CAEC : Do you eat any food between meals?", 
-            ["No", "Sometimes", "Frequently", "Always"], 
-            help="Do you eat any food between meals?"
-        )
-        calc = st.selectbox(
-            "CALC : How often do you drink alcohol?", 
-            ["No", "Sometimes", "Frequently", "Always"], 
-            help="How often do you drink alcohol?"
-        )
-        fcvc = st.slider(
-            "FCVC : Do you usually eat vegetables in your meals?", 
-            1, 
-            3, 
-            2, 
-            help="How often do you eat vegetables in your meals? (1: Rarely, 3: Always)"
-        )
-        ncp = st.slider(
-            "NCP : How many main meals do you have daily?", 
-            1, 
-            5, 
-            3, 
-            help="How many main meals do you have daily?"
-        )
-        ch2o = st.slider(
-            "CH2O : How much water do you drink daily?", 
-            1, 
-            3, 
-            2, 
-            help="How much water do you drink daily? (in liters)"
-        )
-        tue = st.slider(
-            "TUE : How much time do you use technological devices daily?", 
-            0, 
-            2, 
-            1, 
-            help="How much time do you spend on technological devices daily? (in hours)"
-        )
+        caec = st.selectbox("Eating Habit (CAEC)", ["No", "Sometimes", "Frequently", "Always"], help="How often do you eat unhealthy foods?")
+        calc = st.selectbox("Caloric Intake (CALC)", ["No", "Sometimes", "Frequently", "Always"], help="How often do you consume excess calories?")
+        fcvc = st.slider("Frequency of Vegetables Consumption (FCVC)", 1, 3, 2, help="How often do you eat vegetables?")
+        ncp = st.slider("Number of Meals per Day (NCP)", 1, 5, 3, help="How many meals do you have per day?")
+        ch2o = st.slider("Daily Water Consumption (CH2O in liters)", 1, 3, 2, help="How much water do you drink daily (in liters)?")
+        tue = st.slider("Time Using Technology (TUE in hours)", 0, 2, 1, help="How many hours do you spend on technology daily?")
 
     # Combine Inputs into DataFrame
     data = {
         "Gender": gender,
         "Age": age,
-        "Height": height,
+        "Height": height / 100,  # Convert cm to meters
         "Weight": weight,
         "family_history": family_history,
         "FAVC": favc,
@@ -214,8 +158,8 @@ st.markdown(
         <ul>
             <li>👤 <strong>Gender:</strong> {user_input['Gender'][0]}</li>
             <li>🎂 <strong>Age:</strong> {user_input['Age'][0]} years</li>
-            <li>📏 <strong>Height:</strong> {user_input['Height'][0]} meters</li>
-            <li>⚖️ <strong>Weight:</strong> {user_input['Weight'][0]} kilograms</li>
+            <li>📏 <strong>Height:</strong> {user_input['Height'][0] * 100:.1f} cm</li>
+            <li>⚖️ <strong>Weight:</strong> {user_input['Weight'][0]} kg</li>
         </ul>
         <div class="input-section-header">Lifestyle Choices</div>
         <ul>
