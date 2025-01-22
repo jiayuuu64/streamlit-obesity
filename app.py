@@ -67,7 +67,7 @@ def user_input_features():
 
 user_input = user_input_features()
 
-# Display user input in a styled box
+# Display user input in a styled box with emojis
 st.subheader("Your Input Parameters")
 
 # Add Custom CSS for Styling
@@ -93,34 +93,34 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Display Inputs in a Nicely Formatted Box
+# Display Inputs in a Nicely Formatted Box with Emojis
 st.markdown(
     f"""
     <div class="input-box">
         <div class="input-section-header">Personal Information</div>
         <ul>
-            <li><strong>Gender:</strong> {user_input['Gender'][0]}</li>
-            <li><strong>Age:</strong> {user_input['Age'][0]} years</li>
-            <li><strong>Height:</strong> {user_input['Height'][0] * 100:.1f} cm</li>
-            <li><strong>Weight:</strong> {user_input['Weight'][0]} kg</li>
+            <li>👤 <strong>Gender:</strong> {user_input['Gender'][0]}</li>
+            <li>🎂 <strong>Age:</strong> {user_input['Age'][0]} years</li>
+            <li>📏 <strong>Height:</strong> {user_input['Height'][0] * 100:.1f} cm</li>
+            <li>⚖️ <strong>Weight:</strong> {user_input['Weight'][0]} kg</li>
         </ul>
         <div class="input-section-header">Lifestyle Choices</div>
         <ul>
-            <li><strong>Family History of Obesity:</strong> {user_input['family_history'][0]}</li>
-            <li><strong>Frequent Consumption of High Caloric Food (FAVC):</strong> {user_input['FAVC'][0]}</li>
-            <li><strong>Smokes:</strong> {user_input['SMOKE'][0]}</li>
-            <li><strong>Monitor Calories (SCC):</strong> {user_input['SCC'][0]}</li>
-            <li><strong>Physical Activity Level (FAF):</strong> {user_input['FAF'][0]}</li>
-            <li><strong>Mode of Transportation (MTRANS):</strong> {user_input['MTRANS'][0]}</li>
+            <li>🏠 <strong>Family History of Obesity:</strong> {user_input['family_history'][0]}</li>
+            <li>🍔 <strong>Frequent Consumption of High Caloric Food (FAVC):</strong> {user_input['FAVC'][0]}</li>
+            <li>🚬 <strong>Smokes:</strong> {user_input['SMOKE'][0]}</li>
+            <li>📊 <strong>Monitor Calories (SCC):</strong> {user_input['SCC'][0]}</li>
+            <li>🏃 <strong>Physical Activity Level (FAF):</strong> {user_input['FAF'][0]}</li>
+            <li>🚗 <strong>Mode of Transportation (MTRANS):</strong> {user_input['MTRANS'][0]}</li>
         </ul>
         <div class="input-section-header">Eating Habits</div>
         <ul>
-            <li><strong>Eating Habit (CAEC):</strong> {user_input['CAEC'][0]}</li>
-            <li><strong>Caloric Intake (CALC):</strong> {user_input['CALC'][0]}</li>
-            <li><strong>Frequency of Vegetables Consumption (FCVC):</strong> {user_input['FCVC'][0]}</li>
-            <li><strong>Number of Meals per Day (NCP):</strong> {user_input['NCP'][0]}</li>
-            <li><strong>Daily Water Consumption (CH2O):</strong> {user_input['CH2O'][0]} liters</li>
-            <li><strong>Time Using Technology (TUE):</strong> {user_input['TUE'][0]} hours</li>
+            <li>🍩 <strong>Eating Habit (CAEC):</strong> {user_input['CAEC'][0]}</li>
+            <li>🍷 <strong>Caloric Intake (CALC):</strong> {user_input['CALC'][0]}</li>
+            <li>🥗 <strong>Frequency of Vegetables Consumption (FCVC):</strong> {user_input['FCVC'][0]}</li>
+            <li>🍽️ <strong>Number of Meals per Day (NCP):</strong> {user_input['NCP'][0]}</li>
+            <li>💧 <strong>Daily Water Consumption (CH2O):</strong> {user_input['CH2O'][0]} liters</li>
+            <li>💻 <strong>Time Using Technology (TUE):</strong> {user_input['TUE'][0]} hours</li>
         </ul>
     </div>
     """,
@@ -129,4 +129,13 @@ st.markdown(
 
 # Dummy Model Prediction Logic
 st.subheader("Prediction")
-st.write("Your obesity prediction will be displayed here.")
+
+# Simulated prediction for demonstration
+st.markdown(
+    f"""
+    <div style="padding: 15px; background-color: #e8f5e9; border: 1px solid #d4edda; border-radius: 8px;">
+        🎯 <strong>Predicted Obesity Level:</strong> <span style="color: red;">Normal Weight</span>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
