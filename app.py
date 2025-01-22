@@ -31,12 +31,60 @@ image_path = "feet.jpg"  # Replace with the path to your background image
 encoded_image = encode_image_to_base64(image_path)
 add_bg_from_local(encoded_image)
 
-# App Header
-st.title("Obesity Prediction App 🎯")
-st.markdown("""
-This app predicts **obesity levels** based on your health and lifestyle inputs.  
-Enter your details in the sidebar to get predictions below.  
-""")
+# Add CSS for styling textboxes
+st.markdown(
+    """
+    <style>
+    .stApp {
+        color: white; /* Changes the default text color to white */
+    }
+    .textbox {
+        background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background for textboxes */
+        padding: 10px;
+        border-radius: 8px;
+        display: inline-block;
+    }
+    .input-box {
+        padding: 15px;
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background for better readability */
+        border: 1px solid #dcdcdc;
+        border-radius: 8px;
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: white; /* Makes the text inside the input box white */
+    }
+    .input-section-header {
+        font-weight: bold;
+        margin-bottom: 10px;
+        font-size: 16px;
+        color: white; /* Ensures section headers are white */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# App Header with textbox
+st.markdown(
+    """
+    <div class="textbox">
+        <h1>Obesity Prediction App 🎯</h1>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+st.markdown(
+    """
+    <div class="textbox">
+        <p>
+        This app predicts <strong>obesity levels</strong> based on your health and lifestyle inputs.<br>
+        Enter your details in the sidebar to get predictions below.
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 st.markdown("---")
 
@@ -95,26 +143,11 @@ def user_input_features():
 user_input = user_input_features()
 
 # Display user input in a styled box with emojis
-st.subheader("Your Input Parameters")
-
 st.markdown(
-    """
-    <style>
-    .input-box {
-        padding: 15px;
-        background-color: #f8f9fa;
-        border: 1px solid #dcdcdc;
-        border-radius: 8px;
-        font-family: Arial, sans-serif;
-        line-height: 1.6;
-    }
-    .input-section-header {
-        font-weight: bold;
-        margin-bottom: 10px;
-        font-size: 16px;
-        color: #333333;
-    }
-    </style>
+    f"""
+    <div class="textbox">
+        <h3>Your Input Parameters</h3>
+    </div>
     """,
     unsafe_allow_html=True,
 )
@@ -215,8 +248,8 @@ prediction_label = obesity_levels.get(prediction, "Unknown")
 st.subheader("Prediction")
 st.markdown(
     f"""
-    <div style="padding: 15px; background-color: #e8f5e9; border: 1px solid #d4edda; border-radius: 8px;">
-        🎯 <strong>Predicted Obesity Level:</strong> <span style="color: red;">{prediction_label}</span>
+    <div style="padding: 15px; background-color: rgba(0, 0, 0, 0.7); border: 1px solid #d4edda; border-radius: 8px; color: white;">
+        🎯 <strong>Predicted Obesity Level:</strong> <span style="color: lightcoral;">{prediction_label}</span>
     </div>
     """,
     unsafe_allow_html=True,
