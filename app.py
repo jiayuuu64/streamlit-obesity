@@ -175,4 +175,4 @@ prediction_label = obesity_levels.get(prediction, "Unknown")
 # Display prediction in a styled rectangle box
 st.markdown('<div class="rectangle-box">', unsafe_allow_html=True)
 st.subheader("Prediction")
-st.markdow
+st.markdown
