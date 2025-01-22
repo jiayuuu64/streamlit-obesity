@@ -13,6 +13,27 @@ Use the sidebar to enter your details, and view the prediction results below.
 
 st.markdown("---")
 
+# Adding background image using CSS
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background-image: url("weight.jpg");
+        background-size: cover;
+        background-position: center;
+    }
+    .rectangle-box {
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
 # Sidebar
 st.sidebar.header("User Input Parameters")
 st.sidebar.markdown("""
@@ -65,7 +86,8 @@ def user_input_features():
 
 user_input = user_input_features()
 
-# Display user input nicely
+# Display user input in a rectangle box with a background color
+st.markdown('<div class="rectangle-box">', unsafe_allow_html=True)
 st.subheader("User Input Parameters")
 
 # Styling the display to be side-by-side
@@ -84,6 +106,8 @@ with col2:
     st.markdown("**Monitor Calories**: " + user_input["SCC"].values[0])
     st.markdown("**Physical Activity**: " + user_input["FAF"].values[0])
     st.markdown("**Transportation Mode**: " + user_input["MTRANS"].values[0])
+
+st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -148,6 +172,7 @@ obesity_levels = {
 
 prediction_label = obesity_levels.get(prediction, "Unknown")
 
-# Display prediction
+# Display prediction in a styled rectangle box
+st.markdown('<div class="rectangle-box">', unsafe_allow_html=True)
 st.subheader("Prediction")
-st.markdown(f"<h3 style='color: blue;'>Predicted Obesity Level: {prediction_label}</h3>", unsafe_allow_html=True)
+st.markdow
