@@ -31,7 +31,7 @@ image_path = "feet.jpg"  # Replace with the path to your background image
 encoded_image = encode_image_to_base64(image_path)
 add_bg_from_local(encoded_image)
 
-# Add CSS for styling textboxes
+# Add CSS for styling
 st.markdown(
     """
     <style>
@@ -39,38 +39,43 @@ st.markdown(
     .stApp {
         color: white;
     }
-    /* Sidebar styling: preserves default colors */
+    /* Sidebar styling */
     section[data-testid="stSidebar"] {
         color: black !important;
-        background-color: #f8f9fa; /* Use the previous background color */
+        background-color: #f8f9fa; /* Sidebar background color */
     }
     .textbox {
-        background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
-        padding: 10px;
-        border-radius: 8px;
-        display: inline-block;
+        background-color: rgba(0, 0, 0, 0.75); /* Darker semi-transparent black */
+        padding: 15px 20px;
+        border-radius: 15px; /* Rounded corners for smoother edges */
+        margin-bottom: 20px; /* Add space between boxes */
+        width: fit-content; /* Auto adjust width to content */
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
     }
     .input-box {
-        padding: 15px;
-        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background for input display */
-        border: 1px solid #dcdcdc;
-        border-radius: 8px;
+        padding: 20px;
+        background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+        border-radius: 15px; /* Rounded corners for smoother edges */
+        border: 1px solid #444; /* Subtle border */
+        margin-bottom: 20px; /* Space below each section */
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
         font-family: Arial, sans-serif;
         line-height: 1.6;
-        color: white; /* Ensure white font inside input box */
+        color: white; /* Ensure text is readable */
     }
     .input-section-header {
         font-weight: bold;
         margin-bottom: 10px;
-        font-size: 16px;
-        color: white; /* Section headers inside input box */
+        font-size: 18px;
+        color: white; /* Section headers */
+        text-decoration: underline; /* Optional underline for section headers */
     }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# App Header with textbox
+# App Header with improved textbox
 st.markdown(
     """
     <div class="textbox">
@@ -148,7 +153,7 @@ def user_input_features():
 
 user_input = user_input_features()
 
-# Display user input in a styled box
+# Input Parameters Header
 st.markdown(
     f"""
     <div class="textbox">
@@ -158,6 +163,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# Display user inputs in a styled box
 st.markdown(
     f"""
     <div class="input-box">
@@ -250,9 +256,7 @@ obesity_levels = {
 
 prediction_label = obesity_levels.get(prediction, "Unknown")
 
-st.markdown("---")
-
-# Display Prediction Header with Textbox
+# Display Prediction Header
 st.markdown(
     """
     <div class="textbox">
@@ -265,7 +269,7 @@ st.markdown(
 # Display Prediction Result
 st.markdown(
     f"""
-    <div style="padding: 15px; background-color: rgba(0, 0, 0, 0.7); border: 1px solid #d4edda; border-radius: 8px; color: white;">
+    <div class="input-box">
         🎯 <strong>Predicted Obesity Level:</strong> <span style="color: lightcoral;">{prediction_label}</span>
     </div>
     """,
