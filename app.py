@@ -101,17 +101,17 @@ def user_input_features():
 
     # Lifestyle Choices Section
     with st.sidebar.expander("Lifestyle Choices"):
-        family_history = st.selectbox("Family History of Obesity", ["Yes", "No"], help="Do you have a family history of obesity?")
+        family_history = st.selectbox("Family History of overweight", ["Yes", "No"], help="Do you have a family history of obesity?")
         favc = st.selectbox("Frequent Consumption of High Caloric Food (FAVC)", ["Yes", "No"], help="Do you frequently consume high-calorie foods?")
-        smoke = st.selectbox("Smokes?", ["Yes", "No"], help="Do you smoke?")
-        scc = st.selectbox("Monitor Calories (SCC)?", ["Yes", "No"], help="Do you monitor your calorie intake?")
+        smoke = st.selectbox("Do you smoke?", ["Yes", "No"], help="Do you smoke?")
+        scc = st.selectbox(" Do you monitor the calories you eat daily (SCC)?", ["Yes", "No"], help="Do you monitor your calorie intake?")
         faf = st.selectbox("Physical Activity (FAF)", ["Low", "Medium", "High"], help="What is your level of physical activity?")
         mtrans = st.selectbox("Mode of Transportation (MTRANS)", ["Walking", "Public_Transportation", "Automobile", "Bike", "Motorbike"], help="How do you typically commute?")
 
     # Eating Habits Section
     with st.sidebar.expander("Eating Habits"):
-        caec = st.selectbox("Eating Habit (CAEC)", ["No", "Sometimes", "Frequently", "Always"], help="How often do you eat unhealthy foods?")
-        calc = st.selectbox("Caloric Intake (CALC)", ["No", "Sometimes", "Frequently", "Always"], help="How often do you consume excess calories?")
+        caec = st.selectbox("Do you eat any food between meals (CAEC)?", ["No", "Sometimes", "Frequently", "Always"], help="How often do you eat unhealthy foods?")
+        calc = st.selectbox("How often do you drink alcohol (CALC)?", ["No", "Sometimes", "Frequently", "Always"], help="How often do you consume excess calories?")
         fcvc = st.slider("Frequency of Vegetables Consumption (FCVC)", 1, 3, 2, help="How often do you eat vegetables?")
         ncp = st.slider("Number of Meals per Day (NCP)", 1, 5, 3, help="How many meals do you have per day?")
         ch2o = st.slider("Daily Water Consumption (CH2O in liters)", 1, 3, 2, help="How much water do you drink daily (in liters)?")
@@ -163,7 +163,7 @@ st.markdown(
         </ul>
         <div class="input-section-header">Lifestyle Choices</div>
         <ul>
-            <li>🏠 <strong>Family History of Obesity:</strong> {user_input['family_history'][0]}</li>
+            <li>🏠 <strong>Family History of Overweight:</strong> {user_input['family_history'][0]}</li>
             <li>🍔 <strong>Frequent Consumption of High Caloric Food (FAVC):</strong> {user_input['FAVC'][0]}</li>
             <li>🚬 <strong>Smokes:</strong> {user_input['SMOKE'][0]}</li>
             <li>📊 <strong>Monitor Calories (SCC):</strong> {user_input['SCC'][0]}</li>
@@ -173,7 +173,7 @@ st.markdown(
         <div class="input-section-header">Eating Habits</div>
         <ul>
             <li>🍩 <strong>Eating Habit (CAEC):</strong> {user_input['CAEC'][0]}</li>
-            <li>🍷 <strong>Caloric Intake (CALC):</strong> {user_input['CALC'][0]}</li>
+            <li>🍷 <strong>Alcohol Intake (CALC):</strong> {user_input['CALC'][0]}</li>
             <li>🥗 <strong>Frequency of Vegetables Consumption (FCVC):</strong> {user_input['FCVC'][0]}</li>
             <li>🍽️ <strong>Number of Meals per Day (NCP):</strong> {user_input['NCP'][0]}</li>
             <li>💧 <strong>Daily Water Consumption (CH2O):</strong> {user_input['CH2O'][0]} liters</li>
