@@ -4,8 +4,7 @@ import altair as alt
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import confusion_matrix
-import seaborn as sns
-import matplotlib.pyplot as plt
+import numpy as np
 
 # App Header
 st.set_page_config(page_title="Obesity Prediction App", layout="wide")
@@ -149,12 +148,25 @@ st.subheader("Model Performance (Confusion Matrix)")
 y_pred = clf.predict(X_test)
 cm = confusion_matrix(y_test, y_pred)
 
-# Plot confusion matrix using seaborn
-fig, ax = plt.subplots(figsize=(6, 6))
-sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=obesity_levels.values(), yticklabels=obesity_levels.values())
-plt.xlabel('Predicted')
-plt.ylabel('True')
-st.pyplot(fig)
+# Convert confusion matrix to a dataframe for Altair charting
+cm_df = pd.DataFrame(cm, index=obesity_levels.values(), columns=obesity_levels.values())
+
+# Melt the confusion matrix for Altair plotting
+cm_melted = cm_df.reset_index().melt(id_vars="index", var_name="Predicted", value_name="Count")
+cm_melted.rename(columns={"index": "True"}, inplace=True)
+
+# Plot confusion matrix using Altair
+chart = alt.Chart(cm_melted).mark_rect().encode(
+    x=alt.X('Predicted:N', title='Predicted Obesity Level'),
+    y=alt.Y('True:N', title='True Obesity Level'),
+    color=alt.Color('Count:Q', scale=alt.Scale(scheme='Blues'), title='Count'),
+    tooltip=['True', 'Predicted', 'Count']
+).properties(
+    width=600,
+    height=400
+)
+
+st.altair_chart(chart, use_container_width=True)
 
 # Footer
 st.markdown("---")
