@@ -13,27 +13,6 @@ Use the sidebar to enter your details, and view the prediction results below.
 
 st.markdown("---")
 
-# Adding background image using CSS
-st.markdown(
-    """
-    <style>
-    .stApp {
-        background-image: url("/image/weight.jpg");
-        background-size: cover;
-        background-position: center;
-    }
-    .rectangle-box {
-        background-color: rgba(255, 255, 255, 0.8);
-        padding: 20px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
 # Sidebar
 st.sidebar.header("User Input Parameters")
 st.sidebar.markdown("""
@@ -86,28 +65,25 @@ def user_input_features():
 
 user_input = user_input_features()
 
-# Display user input in a rectangle box with a background color
-st.markdown('<div class="rectangle-box">', unsafe_allow_html=True)
+# Display user input nicely
 st.subheader("User Input Parameters")
 
 # Styling the display to be side-by-side
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown(f"**Gender**: {user_input['Gender'][0]}")
-    st.markdown(f"**Age**: {user_input['Age'][0]} years")
-    st.markdown(f"**Height**: {user_input['Height'][0]} m")
-    st.markdown(f"**Weight**: {user_input['Weight'][0]} kg")
+    st.markdown("**Gender**: " + user_input["Gender"].values[0])
+    st.markdown("**Age**: " + str(user_input["Age"].values[0]))
+    st.markdown("**Height**: " + str(user_input["Height"].values[0]) + " m")
+    st.markdown("**Weight**: " + str(user_input["Weight"].values[0]) + " kg")
 
 with col2:
-    st.markdown(f"**Family History of Obesity**: {user_input['family_history'][0]}")
-    st.markdown(f"**Frequent Caloric Food**: {user_input['FAVC'][0]}")
-    st.markdown(f"**Smokes**: {user_input['SMOKE'][0]}")
-    st.markdown(f"**Monitor Calories**: {user_input['SCC'][0]}")
-    st.markdown(f"**Physical Activity**: {user_input['FAF'][0]}")
-    st.markdown(f"**Transportation Mode**: {user_input['MTRANS'][0]}")
-
-st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("**Family History of Obesity**: " + user_input["family_history"].values[0])
+    st.markdown("**Frequent Caloric Food**: " + user_input["FAVC"].values[0])
+    st.markdown("**Smokes**: " + user_input["SMOKE"].values[0])
+    st.markdown("**Monitor Calories**: " + user_input["SCC"].values[0])
+    st.markdown("**Physical Activity**: " + user_input["FAF"].values[0])
+    st.markdown("**Transportation Mode**: " + user_input["MTRANS"].values[0])
 
 st.markdown("---")
 
@@ -172,8 +148,6 @@ obesity_levels = {
 
 prediction_label = obesity_levels.get(prediction, "Unknown")
 
-# Display prediction in a styled rectangle box
-st.markdown('<div class="rectangle-box">', unsafe_allow_html=True)
+# Display prediction
 st.subheader("Prediction")
 st.markdown(f"<h3 style='color: blue;'>Predicted Obesity Level: {prediction_label}</h3>", unsafe_allow_html=True)
-st.markdown('</div>', unsafe_allow_html=True)
