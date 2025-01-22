@@ -15,35 +15,37 @@ Enter your details in the sidebar to get predictions below.
 
 st.markdown("---")
 
-# Sidebar
+# Sidebar with collapsible input sections
 st.sidebar.header("User Input Parameters")
-st.sidebar.markdown("""
-Please enter your details below. Your inputs will be used to predict your obesity level.  
-""")
+st.sidebar.markdown("Enter your details below. Your inputs will be used to predict your obesity level.")
 
+# Personal Information Section
+with st.sidebar.expander("Personal Information", expanded=True):
+    gender = st.selectbox("Gender", ["Male", "Female"], help="Select your gender.")
+    age = st.slider("Age", 10, 80, 30, help="Select your age.")
+    height = st.slider("Height (in cm)", 130, 200, 170, help="Select your height in cm.")
+    weight = st.slider("Weight (in kg)", 30, 150, 70, help="Select your weight in kg.")
+
+# Lifestyle Choices Section
+with st.sidebar.expander("Lifestyle Choices"):
+    family_history = st.selectbox("Family History of Obesity", ["Yes", "No"], help="Do you have a family history of obesity?")
+    favc = st.selectbox("Frequent Consumption of High Caloric Food (FAVC)", ["Yes", "No"], help="Do you frequently consume high-calorie foods?")
+    smoke = st.selectbox("Smokes?", ["Yes", "No"], help="Do you smoke?")
+    scc = st.selectbox("Monitor Calories (SCC)?", ["Yes", "No"], help="Do you monitor your calorie intake?")
+    faf = st.selectbox("Physical Activity (FAF)", ["Low", "Medium", "High"], help="What is your level of physical activity?")
+    mtrans = st.selectbox("Mode of Transportation (MTRANS)", ["Walking", "Public_Transportation", "Automobile", "Bike", "Motorbike"], help="How do you typically commute?")
+
+# Eating Habits Section
+with st.sidebar.expander("Eating Habits"):
+    caec = st.selectbox("Eating Habit (CAEC)", ["No", "Sometimes", "Frequently", "Always"], help="How often do you eat unhealthy foods?")
+    calc = st.selectbox("Caloric Intake (CALC)", ["No", "Sometimes", "Frequently", "Always"], help="How often do you consume excess calories?")
+    fcvc = st.slider("Frequency of Vegetables Consumption (FCVC)", 1, 3, 2, help="How often do you eat vegetables?")
+    ncp = st.slider("Number of Meals per Day (NCP)", 1, 5, 3, help="How many meals do you have per day?")
+    ch2o = st.slider("Daily Water Consumption (CH2O in liters)", 1, 3, 2, help="How much water do you drink daily (in liters)?")
+    tue = st.slider("Time Using Technology (TUE in hours)", 0, 2, 1, help="How many hours do you spend on technology daily?")
+
+# Collating user inputs into a dataframe
 def user_input_features():
-    st.sidebar.markdown("### Personal Information")
-    gender = st.sidebar.selectbox("Gender", ["Male", "Female"], help="Select your gender.")
-    age = st.sidebar.slider("Age", 10, 80, 30, help="Select your age.")
-    height = st.sidebar.slider("Height (in cm)", 130, 200, 170, help="Select your height in cm.")
-    weight = st.sidebar.slider("Weight (in kg)", 30, 150, 70, help="Select your weight in kg.")
-
-    st.sidebar.markdown("### Lifestyle Choices")
-    family_history = st.sidebar.selectbox("Family History of Obesity", ["Yes", "No"], help="Do you have a family history of obesity?")
-    favc = st.sidebar.selectbox("Frequent Consumption of High Caloric Food (FAVC)", ["Yes", "No"], help="Do you frequently consume high-calorie foods?")
-    smoke = st.sidebar.selectbox("Smokes?", ["Yes", "No"], help="Do you smoke?")
-    scc = st.sidebar.selectbox("Monitor Calories (SCC)?", ["Yes", "No"], help="Do you monitor your calorie intake?")
-    faf = st.sidebar.selectbox("Physical Activity (FAF)", ["Low", "Medium", "High"], help="What is your level of physical activity?")
-    mtrans = st.sidebar.selectbox("Mode of Transportation (MTRANS)", ["Walking", "Public_Transportation", "Automobile", "Bike", "Motorbike"], help="How do you typically commute?")
-
-    st.sidebar.markdown("### Eating Habits")
-    caec = st.sidebar.selectbox("Eating Habit (CAEC)", ["No", "Sometimes", "Frequently", "Always"], help="How often do you eat unhealthy foods?")
-    calc = st.sidebar.selectbox("Caloric Intake (CALC)", ["No", "Sometimes", "Frequently", "Always"], help="How often do you consume excess calories?")
-    fcvc = st.sidebar.slider("Frequency of Consumption of Vegetables (FCVC)", 1, 3, 2, help="How often do you eat vegetables?")
-    ncp = st.sidebar.slider("Number of Meals per Day (NCP)", 1, 5, 3, help="How many meals do you have per day?")
-    ch2o = st.sidebar.slider("Daily Water Consumption (CH2O in liters)", 1, 3, 2, help="How much water do you drink daily (in liters)?")
-    tue = st.sidebar.slider("Time Using Technology (TUE in hours)", 0, 2, 1, help="How many hours do you spend on technology daily?")
-
     data = {
         "Gender": gender,
         "Age": age,
@@ -62,10 +64,41 @@ def user_input_features():
         "CH2O": ch2o,
         "TUE": tue,
     }
-    features = pd.DataFrame(data, index=[0])
-    return features
+    return pd.DataFrame(data, index=[0])
 
 user_input = user_input_features()
+
+# Display user input in a box
+st.subheader("Your Input Parameters")
+st.markdown(
+    f"""
+    <div style="padding: 10px; background-color: #f8f9fa; border: 1px solid #dcdcdc; border-radius: 5px;">
+        <strong>Personal Information:</strong><br>
+        - Gender: {user_input['Gender'][0]}<br>
+        - Age: {user_input['Age'][0]} years<br>
+        - Height: {user_input['Height'][0] * 100} cm<br>
+        - Weight: {user_input['Weight'][0]} kg<br><br>
+        
+        <strong>Lifestyle Choices:</strong><br>
+        - Family History of Obesity: {user_input['family_history'][0]}<br>
+        - Frequent Consumption of High Caloric Food: {user_input['FAVC'][0]}<br>
+        - Smokes: {user_input['SMOKE'][0]}<br>
+        - Monitor Calories: {user_input['SCC'][0]}<br>
+        - Physical Activity Level: {user_input['FAF'][0]}<br>
+        - Mode of Transportation: {user_input['MTRANS'][0]}<br><br>
+        
+        <strong>Eating Habits:</strong><br>
+        - Eating Habit: {user_input['CAEC'][0]}<br>
+        - Caloric Intake: {user_input['CALC'][0]}<br>
+        - Frequency of Vegetables Consumption: {user_input['FCVC'][0]}<br>
+        - Number of Meals per Day: {user_input['NCP'][0]}<br>
+        - Daily Water Consumption: {user_input['CH2O'][0]} liters<br>
+        - Time Using Technology: {user_input['TUE'][0]} hours
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
 
 # Display user input in a nicer, side-by-side format
 st.subheader("Your Input Parameters")
