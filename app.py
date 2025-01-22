@@ -101,7 +101,7 @@ def user_input_features():
 
     # Lifestyle Choices Section
     with st.sidebar.expander("Lifestyle Choices"):
-        family_history = st.selectbox("Family History of overweight", ["Yes", "No"], help="Do you have a family history of obesity?")
+        family_history = st.selectbox("Family History of Overweight", ["Yes", "No"], help="Do you have a family history of obesity?")
         favc = st.selectbox("Frequent Consumption of High Caloric Food (FAVC)", ["Yes", "No"], help="Do you frequently consume high-calorie foods?")
         smoke = st.selectbox("Do you smoke?", ["Yes", "No"], help="Do you smoke?")
         scc = st.selectbox(" Do you monitor the calories you eat daily (SCC)?", ["Yes", "No"], help="Do you monitor your calorie intake?")
