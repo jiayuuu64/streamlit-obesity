@@ -95,33 +95,33 @@ def user_input_features():
     # Personal Information Section
     with st.sidebar.expander("Personal Information", expanded=True):
         gender = st.selectbox("Gender", ["Male", "Female"], help="Select your gender.")
-        age = st.slider("Age", 10, 80, 30, help="Enter your age.")
-        height = st.slider("Height (in meters)", 1.45, 1.98, 1.70, help="Enter your height in meters.")
-        weight = st.slider("Weight (in kg)", 39.0, 173.0, 70.0, help="Enter your weight in kilograms.")
+        age = st.slider("Age", 10, 80, 30, help="Select your age.")
+        height = st.slider("Height (in cm)", 130, 198, 170, help="Select your height in cm.")
+        weight = st.slider("Weight (in kg)", 30, 173, 70, help="Select your weight in kg.")
 
     # Lifestyle Choices Section
     with st.sidebar.expander("Lifestyle Choices"):
-        family_history = st.selectbox("Family History of Obesity", ["Yes", "No"], help="Has a family member suffered or suffers from overweight?")
-        favc = st.selectbox("Do you eat high caloric food frequently?", ["Yes", "No"], help="Do you consume high-calorie foods often?")
-        smoke = st.selectbox("Do you smoke?", ["Yes", "No"], help="Do you smoke regularly?")
-        scc = st.selectbox("Do you monitor the calories you eat daily?", ["Yes", "No"], help="Do you track your calorie intake daily?")
-        faf = st.selectbox("How often do you have physical activity?", ["Low", "Medium", "High"], help="Rate your physical activity level.")
-        mtrans = st.selectbox("Which transportation do you usually use?", ["Walking", "Public_Transportation", "Automobile", "Bike", "Motorbike"], help="Select your most used mode of transportation.")
+        family_history = st.selectbox("Family History of Obesity", ["Yes", "No"], help="Do you have a family history of obesity?")
+        favc = st.selectbox("Frequent Consumption of High Caloric Food (FAVC)", ["Yes", "No"], help="Do you frequently consume high-calorie foods?")
+        smoke = st.selectbox("Smokes?", ["Yes", "No"], help="Do you smoke?")
+        scc = st.selectbox("Monitor Calories (SCC)?", ["Yes", "No"], help="Do you monitor your calorie intake?")
+        faf = st.selectbox("Physical Activity (FAF)", ["Low", "Medium", "High"], help="What is your level of physical activity?")
+        mtrans = st.selectbox("Mode of Transportation (MTRANS)", ["Walking", "Public_Transportation", "Automobile", "Bike", "Motorbike"], help="How do you typically commute?")
 
     # Eating Habits Section
     with st.sidebar.expander("Eating Habits"):
-        caec = st.selectbox("Do you eat any food between meals?", ["No", "Sometimes", "Frequently", "Always"], help="How often do you eat between meals?")
-        calc = st.selectbox("How often do you drink alcohol?", ["No", "Sometimes", "Frequently", "Always"], help="How often do you consume alcohol?")
-        fcvc = st.slider("How often do you eat vegetables?", 1, 3, 2, help="Frequency of vegetables in your diet.")
-        ncp = st.slider("How many main meals do you have daily?", 1, 5, 3, help="Number of main meals you consume daily.")
-        ch2o = st.slider("How much water do you drink daily (in liters)?", 1, 3, 2, help="Liters of water consumed daily.")
-        tue = st.slider("How much time do you use technology daily (in hours)?", 0, 2, 1, help="Hours spent on technological devices daily.")
+        caec = st.selectbox("Eating Habit (CAEC)", ["No", "Sometimes", "Frequently", "Always"], help="How often do you eat unhealthy foods?")
+        calc = st.selectbox("Caloric Intake (CALC)", ["No", "Sometimes", "Frequently", "Always"], help="How often do you consume excess calories?")
+        fcvc = st.slider("Frequency of Vegetables Consumption (FCVC)", 1, 3, 2, help="How often do you eat vegetables?")
+        ncp = st.slider("Number of Meals per Day (NCP)", 1, 5, 3, help="How many meals do you have per day?")
+        ch2o = st.slider("Daily Water Consumption (CH2O in liters)", 1, 3, 2, help="How much water do you drink daily (in liters)?")
+        tue = st.slider("Time Using Technology (TUE in hours)", 0, 2, 1, help="How many hours do you spend on technology daily?")
 
     # Combine Inputs into DataFrame
     data = {
         "Gender": gender,
         "Age": age,
-        "Height": height,
+        "Height": height / 100,  # Convert cm to meters
         "Weight": weight,
         "family_history": family_history,
         "FAVC": favc,
@@ -139,6 +139,50 @@ def user_input_features():
     return pd.DataFrame(data, index=[0])
 
 user_input = user_input_features()
+
+# Input Parameters Header
+st.markdown(
+    f"""
+    <div class="textbox">
+        <h3>Your Input Parameters</h3>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Display user inputs in a styled box
+st.markdown(
+    f"""
+    <div class="input-box">
+        <div class="input-section-header">Personal Information</div>
+        <ul>
+            <li>👤 <strong>Gender:</strong> {user_input['Gender'][0]}</li>
+            <li>🎂 <strong>Age:</strong> {user_input['Age'][0]} years</li>
+            <li>📏 <strong>Height:</strong> {user_input['Height'][0] * 100:.1f} cm</li>
+            <li>⚖️ <strong>Weight:</strong> {user_input['Weight'][0]} kg</li>
+        </ul>
+        <div class="input-section-header">Lifestyle Choices</div>
+        <ul>
+            <li>🏠 <strong>Family History of Obesity:</strong> {user_input['family_history'][0]}</li>
+            <li>🍔 <strong>Frequent Consumption of High Caloric Food (FAVC):</strong> {user_input['FAVC'][0]}</li>
+            <li>🚬 <strong>Smokes:</strong> {user_input['SMOKE'][0]}</li>
+            <li>📊 <strong>Monitor Calories (SCC):</strong> {user_input['SCC'][0]}</li>
+            <li>🏃 <strong>Physical Activity Level (FAF):</strong> {user_input['FAF'][0]}</li>
+            <li>🚗 <strong>Mode of Transportation (MTRANS):</strong> {user_input['MTRANS'][0]}</li>
+        </ul>
+        <div class="input-section-header">Eating Habits</div>
+        <ul>
+            <li>🍩 <strong>Eating Habit (CAEC):</strong> {user_input['CAEC'][0]}</li>
+            <li>🍷 <strong>Caloric Intake (CALC):</strong> {user_input['CALC'][0]}</li>
+            <li>🥗 <strong>Frequency of Vegetables Consumption (FCVC):</strong> {user_input['FCVC'][0]}</li>
+            <li>🍽️ <strong>Number of Meals per Day (NCP):</strong> {user_input['NCP'][0]}</li>
+            <li>💧 <strong>Daily Water Consumption (CH2O):</strong> {user_input['CH2O'][0]} liters</li>
+            <li>💻 <strong>Time Using Technology (TUE):</strong> {user_input['TUE'][0]} hours</li>
+        </ul>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 # Load Dataset
 @st.cache_data
@@ -169,8 +213,8 @@ def preprocess_data(df):
 data = preprocess_data(data)
 
 # Separate features and target
-X = data.drop(columns=["Obesity_level"])  # Replace with your target column name
-y = data["Obesity_level"]  # Replace with your target column name
+X = data.drop(columns=["Obesity"])  # Replace with your target column name
+y = data["Obesity"]  # Replace with your target column name
 
 # Split data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -186,11 +230,47 @@ preprocessed_input = preprocessed_input[X_train.columns]
 # Make prediction
 prediction = clf.predict(preprocessed_input)[0]
 
-# Display Prediction
+# Map prediction to obesity level labels
+obesity_levels = {
+    "Insufficient_Weight": "Insufficient Weight",
+    "Normal_Weight": "Normal Weight",
+    "Overweight_Level_I": "Overweight Level I",
+    "Overweight_Level_II": "Overweight Level II",
+    "Obesity_Type_I": "Obesity Type I",
+    "Obesity_Type_II": "Obesity Type II",
+    "Obesity_Type_III": "Obesity Type III",
+}
+
+prediction_label = obesity_levels.get(prediction, "Unknown")
+
+# Determine text color based on prediction
+if prediction_label == "Normal Weight":
+    prediction_color = "green"  # Green for Normal Weight
+else:
+    prediction_color = "red"  # Red for all other obesity levels
+
+# Display Prediction Header
+st.markdown(
+    """
+    <div class="textbox">
+        <h3>Prediction</h3>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Display Prediction Result
 st.markdown(
     f"""
-    <div class="textbox">
-        🎯 <strong>Predicted Obesity Level:</strong> <span style="color:red; font-size: 24px;">{prediction}</span>
+    <div style="
+        padding: 20px; 
+        background-color: rgba(0, 0, 0, 0.7); 
+        border-radius: 15px; 
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); 
+        text-align: center;
+    ">
+        🎯 <strong style="font-size: 24px; color: white">Predicted Obesity Level:</strong> 
+        <span style="font-size: 28px; color: {prediction_color};">{prediction_label}</span>
     </div>
     """,
     unsafe_allow_html=True,
