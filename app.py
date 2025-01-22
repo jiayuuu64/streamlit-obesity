@@ -5,15 +5,20 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
 # App Header
+st.set_page_config(page_title="Obesity Prediction App", layout="wide")
 st.title("Obesity Prediction App 🎯")
 st.markdown("""
 This app predicts **obesity levels** based on your health and lifestyle inputs.  
-Use the sidebar to enter your details, and view the prediction results below.
+Use the sidebar to enter your details, and view the prediction results below.  
 """)
+
 st.markdown("---")
 
 # Sidebar
 st.sidebar.header("User Input Parameters")
+st.sidebar.markdown("""
+Enter your details in the fields below and click the button to get predictions.
+""")
 
 def user_input_features():
     st.sidebar.markdown("### Personal Information")
@@ -134,7 +139,7 @@ prediction_label = obesity_levels.get(prediction, "Unknown")
 
 # Display prediction
 st.subheader("Prediction")
-st.write(f"Predicted Obesity Level: **{prediction_label}**")
+st.markdown(f"<h3 style='color: blue;'>Predicted Obesity Level: {prediction_label}</h3>", unsafe_allow_html=True)
 
 # Display prediction probability using a bar chart
 st.subheader("Prediction Probability")
@@ -149,17 +154,6 @@ chart = alt.Chart(probability_df).mark_bar().encode(
 )
 st.altair_chart(chart, use_container_width=True)
 
-# Scatter Plot: Predicted vs Actual
-st.subheader("Scatter Plot: Predicted vs Actual")
-scatter_df = pd.DataFrame({
-    "Actual": y_test,
-    "Predicted": clf.predict(X_test),
-})
-scatter_chart = alt.Chart(scatter_df).mark_circle(size=60).encode(
-    x=alt.X("Actual:N", title="Actual Obesity Level"),
-    y=alt.Y("Predicted:N", title="Predicted Obesity Level"),
-    color=alt.Color("Actual:N", legend=None),
-).interactive()
-st.altair_chart(scatter_chart, use_container_width=True)
-
-st.success("Prediction complete! 🎉")
+# Footer
+st.markdown("---")
+st.markdown("Built with ❤️ using Streamlit")
