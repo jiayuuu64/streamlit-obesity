@@ -27,7 +27,7 @@ def add_bg_from_local(encoded_image):
     )
 
 # Call function to add background
-image_path = "obesitybg.webp"  # Replace with the path to your background image
+image_path = "path/to/obesitybg.webp"  # Replace with the path to your background image
 encoded_image = encode_image_to_base64(image_path)
 add_bg_from_local(encoded_image)
 
