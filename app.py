@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
-import matplotlib.pyplot as plt
 
 # App Header
 st.title("Obesity Prediction App 🎯")
@@ -133,18 +132,14 @@ prediction_label = obesity_levels.get(prediction, "Unknown")
 st.subheader("Prediction")
 st.write(f"Predicted Obesity Level: {prediction_label}")
 
-# Display prediction probability
+# Display prediction probability using Streamlit's bar chart
 st.subheader("Prediction Probability")
 st.markdown("### Here's how likely you are to belong to each obesity category:")
-try:
-    fig, ax = plt.subplots()
-    ax.bar(obesity_levels.values(), prediction_proba * 100, color="skyblue")
-    ax.set_ylabel("Probability (%)")
-    ax.set_title("Obesity Level Prediction Probability")
-    ax.set_xticklabels(obesity_levels.values(), rotation=45, ha="right")
-    st.pyplot(fig)
-except Exception as e:
-    st.error(f"Error creating the plot: {e}")
+probability_df = pd.DataFrame({
+    "Obesity Level": [obesity_levels.get(level, level) for level in clf.classes_],
+    "Probability (%)": prediction_proba * 100,
+})
+st.bar_chart(probability_df.set_index("Obesity Level"))
 
 # Add Feedback
 st.success("Prediction complete! 🎉")
