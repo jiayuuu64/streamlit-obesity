@@ -80,18 +80,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown(
-    """
-    <div class="textbox">
-        <p>
-        This app predicts <strong>obesity levels</strong> based on your health and lifestyle inputs.<br>
-        Enter your details in the sidebar to get predictions below.
-        </p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
 st.markdown("---")
 
 # Sidebar
