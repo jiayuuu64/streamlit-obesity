@@ -94,7 +94,6 @@ clf.fit(X_train, y_train)
 
 # Preprocess user input
 preprocessed_input = preprocess_data(user_input)
-print(preprocess_data.iloc[0, :4])
 
 # Ensure column order matches training data
 preprocessed_input = preprocessed_input[X_train.columns]
