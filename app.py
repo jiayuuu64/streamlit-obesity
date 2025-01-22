@@ -23,8 +23,8 @@ def user_input_features():
     with st.sidebar.expander("Personal Information", expanded=True):
         gender = st.selectbox("Gender", ["Male", "Female"], help="Select your gender.")
         age = st.slider("Age", 10, 80, 30, help="Select your age.")
-        height = st.slider("Height (in cm)", 130, 200, 170, help="Select your height in cm.")
-        weight = st.slider("Weight (in kg)", 30, 150, 70, help="Select your weight in kg.")
+        height = st.slider("Height (in cm)", 130, 198, 170, help="Select your height in cm.")
+        weight = st.slider("Weight (in kg)", 30, 173, 70, help="Select your weight in kg.")
 
     # Lifestyle Choices Section
     with st.sidebar.expander("Lifestyle Choices"):
