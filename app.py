@@ -159,7 +159,7 @@ cm_melted.rename(columns={"index": "True"}, inplace=True)
 chart = alt.Chart(cm_melted).mark_rect().encode(
     x=alt.X('Predicted:N', title='Predicted Obesity Level'),
     y=alt.Y('True:N', title='True Obesity Level'),
-    color=alt.Color('Count:Q', scale=alt.Scale(scheme='Blues'), title='Count'),
+    color=alt.Color('Count:Q', scale=alt.Scale(scheme='blues'), title='Count'),
     tooltip=['True', 'Predicted', 'Count']
 ).properties(
     width=600,
