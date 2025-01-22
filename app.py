@@ -3,6 +3,31 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
+
+# Function to encode an image to base64
+def encode_image_to_base64(image_path):
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode()
+
+# Function to set the background
+def add_bg_from_local(encoded_image):
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background: url("data:image/png;base64,{encoded_image}");
+            background-size: cover;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Call function to add background
+image_path = "weight.jpg"  # Replace with the path to your background image
+encoded_image = encode_image_to_base64(image_path)
+add_bg_from_local(encoded_image)
+
 # App Header
 st.set_page_config(page_title="Obesity Prediction App", layout="wide")
 st.title("Obesity Prediction App 🎯")
@@ -10,6 +35,7 @@ st.markdown("""
 This app predicts **obesity levels** based on your health and lifestyle inputs.  
 Enter your details in the sidebar to get predictions below.  
 """)
+
 
 st.markdown("---")
 
