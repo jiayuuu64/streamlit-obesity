@@ -3,41 +3,32 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
-# App Header
-st.title("Obesity Prediction App 🎯")
-st.markdown("This app predicts the **obesity level** based on your health and lifestyle choices.")
-st.markdown("---")
+st.title("Obesity Prediction App")
 
-# Sidebar
 st.sidebar.header("User Input Parameters")
 
 def user_input_features():
-    with st.sidebar.expander("Personal Information", expanded=True):
-        gender = st.selectbox("Gender", ["Male", "Female"], help="Your biological gender.")
-        age = st.slider("Age", 10, 80, 30, help="Your age in years.")
-        height = st.slider("Height (in cm)", 130, 200, 170, help="Your height in centimeters.")
-        weight = st.slider("Weight (in kg)", 30, 150, 70, help="Your weight in kilograms.")
-
-    with st.sidebar.expander("Lifestyle Choices", expanded=True):
-        family_history = st.selectbox("Family History of Obesity", ["Yes", "No"], help="Does obesity run in your family?")
-        favc = st.selectbox("Frequent Consumption of High Caloric Food (FAVC)", ["Yes", "No"])
-        smoke = st.selectbox("Smokes?", ["Yes", "No"])
-        scc = st.selectbox("Monitor Calories (SCC)?", ["Yes", "No"])
-        faf = st.selectbox("Physical Activity (FAF)", ["Low", "Medium", "High"])
-        mtrans = st.selectbox("Mode of Transportation (MTRANS)", ["Walking", "Public_Transportation", "Automobile", "Bike", "Motorbike"])
-
-    with st.sidebar.expander("Eating Habits", expanded=True):
-        caec = st.selectbox("Eating Habit (CAEC)", ["No", "Sometimes", "Frequently", "Always"])
-        calc = st.selectbox("Caloric Intake (CALC)", ["No", "Sometimes", "Frequently", "Always"])
-        fcvc = st.slider("Frequency of Consumption of Vegetables (FCVC)", 1, 3, 2)
-        ncp = st.slider("Number of Meals per Day (NCP)", 1, 5, 3)
-        ch2o = st.slider("Daily Water Consumption (CH2O in liters)", 1, 3, 2)
-        tue = st.slider("Time Using Technology (TUE in hours)", 0, 2, 1)
+    gender = st.sidebar.selectbox("Gender", ["Male", "Female"])
+    age = st.sidebar.slider("Age", 10, 80, 30)
+    height = st.sidebar.slider("Height (in cm)", 130, 200, 170)
+    weight = st.sidebar.slider("Weight (in kg)", 30, 150, 70)
+    family_history = st.sidebar.selectbox("Family History of Obesity", ["Yes", "No"])
+    favc = st.sidebar.selectbox("Frequent Consumption of High Caloric Food (FAVC)", ["Yes", "No"])
+    smoke = st.sidebar.selectbox("Smokes?", ["Yes", "No"])
+    scc = st.sidebar.selectbox("Monitor Calories (SCC)?", ["Yes", "No"])
+    faf = st.sidebar.selectbox("Physical Activity (FAF)", ["Low", "Medium", "High"])
+    mtrans = st.sidebar.selectbox("Mode of Transportation (MTRANS)", ["Walking", "Public_Transportation", "Automobile", "Bike", "Motorbike"])
+    caec = st.sidebar.selectbox("Eating Habit (CAEC)", ["No", "Sometimes", "Frequently", "Always"])
+    calc = st.sidebar.selectbox("Caloric Intake (CALC)", ["No", "Sometimes", "Frequently", "Always"])
+    fcvc = st.sidebar.slider("Frequency of Consumption of Vegetables (FCVC)", 1, 3, 2)
+    ncp = st.sidebar.slider("Number of Meals per Day (NCP)", 1, 5, 3)
+    ch2o = st.sidebar.slider("Daily Water Consumption (CH2O in liters)", 1, 3, 2)
+    tue = st.sidebar.slider("Time Using Technology (TUE in hours)", 0, 2, 1)
 
     data = {
         "Gender": gender,
         "Age": age,
-        "Height": height / 100,  # Convert cm to meters
+        "Height": height / 100,  
         "Weight": weight,
         "family_history": family_history,
         "FAVC": favc,
@@ -57,7 +48,7 @@ def user_input_features():
 
 user_input = user_input_features()
 
-# Display User Inputs
+# Display user input
 st.subheader("User Input Parameters")
 st.write(user_input)
 
@@ -132,15 +123,7 @@ prediction_label = obesity_levels.get(prediction, "Unknown")
 st.subheader("Prediction")
 st.write(f"Predicted Obesity Level: {prediction_label}")
 
-# Display prediction probability using Streamlit's bar chart
+# Display prediction probability
 st.subheader("Prediction Probability")
-st.markdown("### Here's how likely you are to belong to each obesity category:")
-probability_df = pd.DataFrame({
-    "Obesity Level": [obesity_levels.get(level, level) for level in clf.classes_],
-    "Probability (%)": prediction_proba * 100,
-})
-st.bar_chart(probability_df.set_index("Obesity Level"))
-
-# Add Feedback
-st.success("Prediction complete! 🎉")
-st.balloons()
+for level, prob in zip(clf.classes_, prediction_proba):
+    st.write(f"{obesity_levels.get(level, level)}: {prob * 100:.2f}%")
