@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 import base64
 
-# Set the page configuration (must be first)
+# Set the page configuration
 st.set_page_config(page_title="Obesity Prediction App", layout="wide")
 
 # Function to encode an image to base64
@@ -28,7 +28,7 @@ def add_bg_from_local(encoded_image):
     )
 
 # Call function to add background
-image_path = "feet.jpg"  # Replace with the path to your background image
+image_path = "feet.jpg"  
 encoded_image = encode_image_to_base64(image_path)
 add_bg_from_local(encoded_image)
 
@@ -187,7 +187,7 @@ st.markdown(
 # Load Dataset
 @st.cache_data
 def load_data():
-    df = pd.read_csv("Obesity prediction.csv")  # Replace with your dataset
+    df = pd.read_csv("Obesity prediction.csv")  
     return df
 
 data = load_data()
@@ -213,8 +213,8 @@ def preprocess_data(df):
 data = preprocess_data(data)
 
 # Separate features and target
-X = data.drop(columns=["Obesity"])  # Replace with your target column name
-y = data["Obesity"]  # Replace with your target column name
+X = data.drop(columns=["Obesity"])  
+y = data["Obesity"]  
 
 # Split data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
